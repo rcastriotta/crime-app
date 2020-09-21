@@ -1,0 +1,38 @@
+{
+    "expo": {
+        "name": "crime-app2",
+        "slug": "crime-app2",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "android": {
+            "package": "com.company",
+            "config": {
+                "googleMaps": {
+                    "apiKey": "<android maps key>"
+                }
+            }
+        },
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.company",
+            "config": {
+                "googleMapsApiKey": "AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88"
+            }
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        }
+    }
+}
