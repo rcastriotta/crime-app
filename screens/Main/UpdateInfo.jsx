@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
         height: '8%',
         backgroundColor: Colors.accent,
         borderRadius: 10,
-        marginTop: '50%',
+        marginTop: '40%',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row'

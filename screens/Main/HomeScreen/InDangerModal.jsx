@@ -26,7 +26,7 @@ const InDangerModal = props => {
                         </TouchableOpacity>
 
                         <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => props.pressHandler('SMS')}>
-                            <Text style={styles.text}>Send out group SMS alert</Text>
+                            <Text style={styles.text}>Send out safety alert(s)</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

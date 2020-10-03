@@ -52,8 +52,8 @@ const AnimatedCircle = props => {
             <View style={styles.circleContainer}>
                 <TouchableOpacity activeOpacity={1.0} onPress={ratingPressHandler}>
                     <AnimatedCircularProgress
-                        size={windowHeight < 700 ? 195 : 220}
-                        width={windowHeight < 700 ? 12 : 17}
+                        size={windowHeight > 700 ? wp('60%') : wp('54%')}
+                        width={17}
                         fill={percentage ? percentage : 0}
                         tintColor={currentColors.main}
                         lineCap={'round'}

@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions, 
 // EXTERNAL
 import Swiper from 'react-native-swiper'
 import { LinearGradient } from 'expo-linear-gradient';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 // COMPONENTS
 import Colors from '../../constants/Colors';
@@ -11,6 +12,7 @@ import SignupScreen from './SignupScreen';
 import LoginScreen from './LoginScreen';
 
 const windowWidth = Dimensions.get('window').width;
+
 
 const WelcomeScreen = () => {
     const [currentIndex, setCurrentIndex] = useState(0)
@@ -141,11 +143,11 @@ const styles = StyleSheet.create({
     },
     button: {
         width: '80%',
-        height: '7%',
+        aspectRatio: 5.5,
         backgroundColor: Colors.accent,
         position: 'absolute',
         bottom: '15%',
-        borderRadius: 50,
+        borderRadius: 100,
         alignItems: 'center',
         justifyContent: 'center',
 
@@ -190,7 +192,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 100,
         height: 100,
-        bottom: 520
+        bottom: hp('70%')
     }
 
 

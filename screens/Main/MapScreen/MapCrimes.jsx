@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     swipeText: {
         color: 'white',
         fontFamily: 'TTN-Bold',
-        fontSize: hp('1.8%')
+        fontSize: wp('4%')
     }
 
 

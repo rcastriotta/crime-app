@@ -78,12 +78,12 @@ const MapScreen = () => {
     }
 
     const showAd = async () => {
-        //await AdMobInterstitial.setAdUnitID('ca-app-pub-1190322108532531/8960723008') //ca-app-pub-1190322108532531/8960723008
-        //await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
-        //await AdMobInterstitial.showAdAsync();
+        await AdMobInterstitial.setAdUnitID('ca-app-pub-1190322108532531/8960723008') //ca-app-pub-1190322108532531/8960723008
+        await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+        await AdMobInterstitial.showAdAsync();
     }
 
-    // on first laod
+    // on first load
     useEffect(() => {
         setCircleStyles({
             strokeWidth: 1,
