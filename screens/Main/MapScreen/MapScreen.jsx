@@ -9,18 +9,17 @@ import * as crimeReportsActions from '../../../store/actions/crimeReports';
 import * as locationActions from '../../../store/actions/location';
 
 // EXTERNAL
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
 import * as Permissions from 'expo-permissions';
+import { AdMobInterstitial } from 'expo-ads-admob';
 
 //COMPONENTS
 import SearchBar from './SearchBar';
 import SearchModal from '../../../components/Main/SearchModal';
-import CrimeReport from '../../../components/Main/CrimeReport';
 import MapCrimes from './MapCrimes';
+import checkIfLargeCity from '../../../utils/checkIfLargeCity';
 
 import Colors from '../../../constants/Colors';
-import { Circle } from 'react-native-svg';
-import { set } from 'react-native-reanimated';
 
 const MapScreen = () => {
     const [isFetching, setIsFetching] = useState(false)
@@ -29,8 +28,10 @@ const MapScreen = () => {
     const [modalVisible, setModalVisible] = useState(false)
     const [crimeSelected, setCrimeSelected] = useState(null)
     const [mapRef, setMapRef] = useState(null)
+    const [currentRadius, setCurrentRadius] = useState(null)
+    const [changedRegion, setChangedRegion] = useState(null)
+    const [circleStyles, setCircleStyles] = useState(null)
 
-    // this will check if there's two in of the same lat and lon
 
     useEffect(() => {
         if (crimeSelected) {
@@ -40,11 +41,7 @@ const MapScreen = () => {
                 setCrimeSelected(conflictingCrimes)
             }
         }
-
     }, [crimeSelected])
-
-
-
 
 
     const locationChange = async (newLocationObj) => {
@@ -55,48 +52,57 @@ const MapScreen = () => {
             longitudeDelta: 0.0421,
         }
         mapRef.animateToRegion(newRegion)
+        setChangedRegion(newRegion)
         getCrimes(newLocationObj)
-    }
-
-    const verifyPermissions = async () => {
-        //will only run if permissions need to be verified
-        const result = await Permissions.askAsync(Permissions.LOCATION);
-        if (result.status !== 'granted') {
-            Alert.alert(`Couldn't get location!`,
-                `Go to settings to grant permissions`, [{ text: 'Okay!' }])
-            return false;
-        }
-        return true;
+        showAd()
     }
 
     const dispatch = useDispatch()
 
     const getCrimes = async (coordinates) => {
+        let radius;
         setIsFetching(true)
-        await dispatch(crimeReportsActions.fetchCrimes(coordinates.lat, coordinates.lng, 1, 'month', 'mapScreen')).catch((err) => {
+
+        if (!currentRadius && location) {
+            // we initialize the map screen to the same radius that the crime report data is based off of
+            radius = checkIfLargeCity(location.city, location.region)
+            setCurrentRadius(radius)
+        } else {
+            setCurrentRadius(0.5)
+            radius = 0.5
+        }
+        await dispatch(crimeReportsActions.fetchCrimes(coordinates.lat, coordinates.lng, radius, 'mapScreen', 100)).catch((err) => {
             console.log(err)
         })
+        setIsFetching(false)
     }
 
-    // on loadedup we check if we haven't retrieved map crimes yet
+    const showAd = async () => {
+        //await AdMobInterstitial.setAdUnitID('ca-app-pub-1190322108532531/8960723008') //ca-app-pub-1190322108532531/8960723008
+        //await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+        //await AdMobInterstitial.showAdAsync();
+    }
+
+    // on first laod
     useEffect(() => {
+        setCircleStyles({
+            strokeWidth: 1,
+            strokeColor: 'rgba(127, 106, 250, .5)',
+            fillColor: 'rgba(127, 106, 250, .08)'
+        })
+
+        showAd();
+
         if (!mapCrimes) {
             (async () => {
                 if (!location) {
-                    console.log('test')
-
-                    // get location
-                    const hasPermissions = await verifyPermissions();
-                    await dispatch(locationActions.getLocation(hasPermissions))
-                        .catch((err) => {
-                            console.log(err)
-                        })
+                    getCrimes({ lat: 40.7127753, lng: -74.0059728 })
+                } else {
+                    getCrimes({ lat: location.lat, lng: location.lng })
                 }
-
-                getCrimes({ lat: location.lat, lng: location.lng })
             })();
         }
-    }, [mapCrimes])
+    }, [])
 
     const checkIfSelected = (crime) => {
         const isArray = crimeSelected.length > 1
@@ -132,17 +138,6 @@ const MapScreen = () => {
         )
     }
 
-
-    // check if location data already exists -- if doesnt check if location already exists -- get all if doesnt
-    if (!location) {
-        return (
-            <View>
-                <ActivityIndicator />
-            </View>
-        )
-    }
-
-
     return (
         <View style={{ flex: 1 }} >
             <MapView
@@ -154,20 +149,31 @@ const MapScreen = () => {
                 maxZoomLevel={20} // default => 20
 
                 initialRegion={{
-                    latitude: location.lat,
-                    longitude: location.lng,
+                    latitude: location ? location.lat : 40.7127753,
+                    longitude: location ? location.lng : -74.0059728,
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 }}
                 ref={ref => setMapRef(ref)}
             >
                 {mapCrimes && mapCrimes.map(crime => renderMarker(crime))}
+                <Circle
+                    key={location ? (location.lat + location.lng).toString() : (40.7127753 + -74.0059728).toString()}
+                    center={{
+                        latitude: changedRegion ? changedRegion.latitude : location ? location.lat : 40.7127753,
+                        longitude: changedRegion ? changedRegion.longitude : location ? location.lng : -74.0059728
+                    }}
+                    radius={currentRadius ? (currentRadius * 1600) : 800}
+                    strokeWidth={circleStyles && circleStyles.strokeWidth}
+                    strokeColor={circleStyles && circleStyles.strokeColor}
+                    fillColor={circleStyles && circleStyles.fillColor}
+                />
 
 
             </MapView>
             {crimeSelected && <MapCrimes selected={crimeSelected} setCrimeSelected={() => setCrimeSelected(null)} />}
 
-            <SearchBar setVisible={() => setModalVisible(true)} />
+            <SearchBar isFetching={isFetching} radius={currentRadius} setVisible={() => setModalVisible(true)} />
             <SearchModal locationChange={locationChange} visible={modalVisible} setVisible={() => setModalVisible(false)} />
         </View>
     )
@@ -181,11 +187,13 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         backgroundColor: Colors.accent,
-        borderRadius: 5
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#4B3F91'
     },
     userMarkerSelected: {
-        height: 25,
-        width: 25,
+        height: 28,
+        width: 28,
         borderWidth: 2,
         borderColor: 'white',
         backgroundColor: Colors.accent,
@@ -196,11 +204,13 @@ const styles = StyleSheet.create({
         height: 20,
         backgroundColor: Colors.accent,
         borderRadius: 5,
-        backgroundColor: 'rgba(0, 90, 255, 1.0)'
+        backgroundColor: 'rgba(0, 90, 255, 1.0)',
+        borderWidth: 1,
+        borderColor: '#00338F'
     },
     policeMarkerSelected: {
-        height: 25,
-        width: 25,
+        height: 28,
+        width: 28,
         borderWidth: 2,
         borderColor: 'white',
         backgroundColor: 'rgba(0, 90, 255, 1.0)',

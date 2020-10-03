@@ -8,11 +8,11 @@ import { MaterialIndicator } from 'react-native-indicators';
 
 // REDUX
 import { useSelector } from 'react-redux';
-import { useLinkProps } from '@react-navigation/native';
 
 const ReportsData = props => {
     // get crime data from past moth 
     const initalData = useSelector(state => state.crimes.crimeAmounts)
+    const location = useSelector(state => state.location.currentLocation)
     const [crimeAmounts, setCrimeAmounts] = useState(null)
 
     useEffect(() => {
@@ -64,14 +64,15 @@ const ReportsData = props => {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={styles.headerText}>LOCATION DETAILS</Text>
                 <View style={styles.circle} />
-                <Text style={{ color: Colors.accent, fontFamily: 'TTN-Medium' }}>within 10 mi</Text>
+                <Text style={{ color: Colors.accent, fontFamily: 'TTN-Medium' }}>within {props.radius ? props.radius : 0.5} mi</Text>
             </View>
             <View style={styles.categoriesContainer}>
 
                 {crimeAmounts
                     ? crimeAmounts.map((typeData) => renderItem(typeData))
-                    : <MaterialIndicator size={30} color={Colors.accent} style={{ marginTop: '25%' }} />
+                    : location || props.isFetching ? <MaterialIndicator size={30} color={Colors.accent} style={{ marginTop: '25%' }} /> : <Text style={styles.noLocationText}>Couldn't get current location</Text>
                 }
+                {crimeAmounts && crimeAmounts.length === 0 ? <Text style={styles.noCrimeData}>No nearby crimes found!</Text> : null}
 
             </View>
         </View>
@@ -96,14 +97,15 @@ const styles = StyleSheet.create({
     },
     category: {
         width: '100%',
-        height: hp('12%'),
+        aspectRatio: 3.45,
         flexDirection: 'row',
         backgroundColor: '#1B1E2F',
         shadowOpacity: .53,
         shadowOffset: { width: 0, height: 3 },
         shadowRadius: 20,
         borderRadius: hp('2%'),
-        marginBottom: hp('4%')
+        marginBottom: hp('4%'),
+
 
     },
     crimeCountContainer: {
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     },
     countText: {
         fontFamily: 'TTN-Medium',
-        fontSize: hp('3.5%'),
+        fontSize: wp('7.3%'),
         color: Colors.accent
     },
     information: {
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     title: {
-        fontSize: hp('2%'),
+        fontSize: wp('4.3%'),
         fontFamily: 'TTN-Bold',
         color: 'white'
     },
@@ -160,6 +162,18 @@ const styles = StyleSheet.create({
     },
     timeAgoText: {
         fontFamily: 'TTN-Medium',
+        color: Colors.accent
+    },
+    noCrimeData: {
+        fontFamily: 'TTN-Medium',
+        color: 'white',
+        alignSelf: 'center',
+        marginTop: hp('5%')
+    },
+    noLocationText: {
+        fontFamily: 'TTN-Medium',
+        alignSelf: 'center',
+        marginTop: '20%',
         color: Colors.accent
     }
 })

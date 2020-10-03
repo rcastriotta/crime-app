@@ -6,7 +6,7 @@ const timeAgo = new TimeAgo('en-US')
 
 
 class Crime {
-    constructor(id, type, lat, lon, description, reportedAt, address, authorName, authorId, authorProfileImg) {
+    constructor(id, type, lat, lon, description, reportedAt, address, authorName, authorId) {
         this.id = id;
         this.type = type;
         this.lat = lat;
@@ -16,7 +16,6 @@ class Crime {
         this.address = address;
         this.authorName = authorName;
         this.authorId = authorId;
-        this.authorProfileImg = authorProfileImg;
     }
     get formattedDate() {
         return timeAgo.format(this.reportedAt)

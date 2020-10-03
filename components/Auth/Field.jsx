@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, Dimensions } from 'react-native';
 
+// EXTERNAL
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import Validator from 'email-validator';
 import PasswordValidator from 'password-validator';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 
 var schema = new PasswordValidator();
@@ -24,7 +26,6 @@ const windowHeight = Dimensions.get('window').height;
 const Field = props => {
     const [fieldText, setFieldText] = useState('')
     const [validated, setValidated] = useState(false)
-    const [textInputRef, setTextInputRef] = useState(null)
 
 
     useEffect(() => {
@@ -69,14 +70,13 @@ const Field = props => {
                     {props.pressed || fieldText ? <TextInput
                         autoFocus={true}
                         keyboardAppearance={'dark'}
-                        style={{ height: 35, width: '90%', color: 'white', fontFamily: 'TTN-Bold', fontSize: 15 }}
+                        style={{ height: 35, width: '90%', color: 'white', fontFamily: 'TTN-Bold', fontSize: wp('4%') }}
                         selectionColor="white"
                         onSubmitEditing={props.onComplete}
                         autoCorrect={false}
                         value={fieldText}
                         onChangeText={text => setFieldText(text)}
                         onFocus={() => props.onPress()}
-                        ref={(ref) => setTextInputRef(ref)}
 
                     /> : null}
                 </View>

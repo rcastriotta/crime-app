@@ -13,7 +13,7 @@ import { MaterialIndicator } from 'react-native-indicators';
 
 
 // REDUX
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as userActions from '../../store/actions/user';
 
 var schema = new PasswordValidator();
@@ -28,6 +28,7 @@ const UpdateInfo = ({ navigation, route }) => {
     const type = route.params.type
     const [focused, setFocused] = useState(null)
     const [updating, setUpdating] = useState(false)
+    const currentEmail = useSelector(state => state.user.email)
 
     const [fieldOneText, setFieldOneText] = useState('')
     const [fieldTwoText, setFieldTwoText] = useState('')
@@ -45,7 +46,7 @@ const UpdateInfo = ({ navigation, route }) => {
             setTwoValidated(Validator.validate(fieldTwoText))
             setThreeValidated(fieldTwoText === fieldThreeText && fieldThreeText !== '')
         } else if (type === 'password') {
-            setTwoValidated(schema.validate(fieldThreeText))
+            setTwoValidated(schema.validate(fieldTwoText))
             setThreeValidated(fieldTwoText === fieldThreeText && fieldThreeText !== '')
         }
     }, [fieldOneText, fieldTwoText, fieldThreeText])
@@ -55,13 +56,13 @@ const UpdateInfo = ({ navigation, route }) => {
     const submitButtonHandler = async () => {
         // reauthenticate 
         setUpdating(true)
+        setOneValidated(true)
         const user = Firebase.auth().currentUser;
         const credential = firebase.auth.EmailAuthProvider.credential(
             user.email,
             fieldOneText
         );
         await user.reauthenticateWithCredential(credential).then(function () {
-            setOneValidated(true)
             if (type === 'email') {
                 if (twoValidated && threeValidated) {
                     dispatch(userActions.updateEmail(fieldThreeText))
@@ -99,7 +100,7 @@ const UpdateInfo = ({ navigation, route }) => {
             } else {
                 Alert.alert(
                     "Error Updating Information",
-                    "Please try again later",
+                    "Please try again",
                     [
                         { text: "OK" }
                     ],
@@ -175,7 +176,7 @@ const UpdateInfo = ({ navigation, route }) => {
                 </View>
                 <TouchableOpacity style={styles.button} onPress={submitButtonHandler}>
                     <View style={{ flex: 1 }} />
-                    <View style={{ flex: 1 }}>
+                    <View style={{ width: '80%' }}>
                         <Text style={styles.buttonText}>{type === 'password' ? 'Change Password' : 'Update Email'}</Text>
                     </View>
                     <View style={{ flex: 1 }} >

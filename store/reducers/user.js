@@ -1,4 +1,4 @@
-import { ADD_CONTACTS, UPDATE_PROFILE_IMAGE, UPDATE_EMAIL } from '../actions/user';
+import { ADD_CONTACTS, UPDATE_EMAIL, SET_LAST_REPORT_TIME } from '../actions/user';
 import { SIGNUP, LOGIN, SIGNOUT } from '../actions/auth';
 
 const initialState = {
@@ -6,7 +6,8 @@ const initialState = {
     uid: null,
     email: null,
     profileImg: null,
-    emergencyContacts: []
+    emergencyContacts: [],
+    lastReportedAt: null
 }
 
 
@@ -20,10 +21,10 @@ const userReducer = (state = initialState, action) => {
             return initialState
         case ADD_CONTACTS:
             return {...state, emergencyContacts: action.emergencyContacts }
-        case UPDATE_PROFILE_IMAGE:
-            return {...state, profileImg: action.uri }
         case UPDATE_EMAIL:
             return {...state, email: action.email }
+        case SET_LAST_REPORT_TIME:
+            return {...state, lastReportedAt: action.time }
         default:
             return state
     }

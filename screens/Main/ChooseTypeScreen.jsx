@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 
-
 // EXTERNAL
 import { Ionicons } from '@expo/vector-icons';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 // COMPONENTS  
 import Colors from '../../constants/Colors';

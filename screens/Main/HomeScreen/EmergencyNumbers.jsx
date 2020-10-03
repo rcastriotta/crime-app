@@ -1,14 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 
 // COMPONENTS
 import Colors from '../../../constants/Colors';
-import { useSelector } from 'react-redux';
 
 // EXTERNAL
-import axios from 'axios';
+import call from 'react-native-phone-call';
 
 const EmergencyNumbers = props => {
+
+    const callNumber = (number) => {
+        //handler to make a call
+        const args = {
+            number: number,
+            prompt: false,
+        };
+        call(args).catch(console.error);
+    };
 
     return (
         <Modal transparent={true} visible={props.visible} animationType="slide">
@@ -25,7 +33,7 @@ const EmergencyNumbers = props => {
                                 <Text style={styles.numberText}>911</Text>
                             </View>
 
-                            <TouchableOpacity style={styles.button}>
+                            <TouchableOpacity style={styles.button} onPress={() => callNumber('911')}>
                                 <Text style={styles.buttonText}>Call</Text>
                             </TouchableOpacity>
                         </View>
@@ -37,7 +45,7 @@ const EmergencyNumbers = props => {
                                 <Text style={styles.numberText}>(800) 222-1222</Text>
                             </View>
 
-                            <TouchableOpacity style={styles.button}>
+                            <TouchableOpacity style={styles.button} onPress={() => callNumber('8002221222')}>
                                 <Text style={styles.buttonText}>Call</Text>
                             </TouchableOpacity>
                         </View>
@@ -48,7 +56,7 @@ const EmergencyNumbers = props => {
                                 <Text style={styles.numberText}>(888) 426-4435</Text>
                             </View>
 
-                            <TouchableOpacity style={styles.button}>
+                            <TouchableOpacity style={styles.button} onPress={() => callNumber('8884264435')}>
                                 <Text style={styles.buttonText}>Call</Text>
                             </TouchableOpacity>
                         </View>
@@ -59,7 +67,7 @@ const EmergencyNumbers = props => {
                                 <Text style={styles.numberText}>(800)-273-8255</Text>
                             </View>
 
-                            <TouchableOpacity style={styles.button}>
+                            <TouchableOpacity style={styles.button} onPress={() => callNumber('8002738255')}>
                                 <Text style={styles.buttonText}>Call</Text>
                             </TouchableOpacity>
                         </View>

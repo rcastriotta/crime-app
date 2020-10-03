@@ -2,21 +2,15 @@ import Firebase from '../../api/firebase/config';
 
 
 // TYPES
-export const UPDATE_NAME = 'UPDATE_PASSWORD'
-export const UPDATE_PROFILE_IMAGE = 'UPDATE_PROFILE_IMAGE'
-export const ADD_CONTACTS = 'ADD_CONTACTS'
-export const UPDATE_EMAIL = 'UPDATE_EMAIL'
+// export const UPDATE_NAME = 'UPDATE_PASSWORD'; --- soon
+export const ADD_CONTACTS = 'ADD_CONTACTS';
+export const UPDATE_EMAIL = 'UPDATE_EMAIL';
+export const SET_LAST_REPORT_TIME = 'UPDATE_LAST_REPORT_TIME';
 
 
 export const addContacts = (contacts) => {
     return (dispatch) => {
         dispatch({ type: ADD_CONTACTS, emergencyContacts: contacts })
-    }
-}
-
-export const updateProfileImage = (uri) => {
-    return (dispatch) => {
-        dispatch({ type: UPDATE_PROFILE_IMAGE, uri: uri })
     }
 }
 
@@ -32,15 +26,9 @@ export const updateEmail = (email) => {
     }
 }
 
-// we need to reauthenticate and then update password
-export const changePassword = (password) => {
-    return async(dispatch) => {
-        var user = firebase.auth().currentUser;
-
-        user.updatePassword(password).then(function() {
-            // Update successful.
-        }).catch(function(error) {
-            console.log(error)
-        });
+export const setLastReportTime = () => {
+    return (dispatch) => {
+        const time = new Date()
+        dispatch({ type: SET_LAST_REPORT_TIME, time })
     }
 }

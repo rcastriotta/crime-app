@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Modal, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Modal, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 // REDUX
 import { useDispatch } from 'react-redux';
 import * as authActions from '../../store/actions/auth';
 
-import Firebase from '../../api/firebase/config';
+// EXTERNAL
+import { MaterialIndicator } from 'react-native-indicators';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 // COMPONENTS
 import Field from '../../components/Auth/Field';
@@ -50,6 +52,10 @@ const SignupScreen = props => {
                 .catch((err) => {
                     // we can popup an alert
                     setLoading(false)
+                    err = err.toString()
+                    const errorMSG = `Please try again`
+                    Alert.alert(`Error Signing Up`,
+                        `${errorMSG}`, [{ text: 'Okay' }])
                     console.log(err)
                 })
         }
@@ -75,20 +81,52 @@ const SignupScreen = props => {
 
 
                 <View style={styles.fieldsContainer}>
-                    <Field setName={text => setName(text)} setValidated={(value) => setNameValidated(value)} icon="md-person" label="FULL NAME" pressed={pressedField === 'name' ? true : false} onComplete={() => setPressedField(null)} onPress={() => setPressedField('name')} />
-                    <Field setEmail={text => setEmail(text)} setValidated={(value) => setEmailValidated(value)} icon="md-mail" label="EMAIL" pressed={pressedField === 'email' ? true : false} onComplete={() => setPressedField(null)} onPress={() => setPressedField('email')} />
-                    <Field setPassword={(text) => setPassword(text)} setValidated={(value) => setPasswordValidated(value)} icon="md-lock" label="PASSWORD" pressed={pressedField === 'password' ? true : false} onComplete={() => setPressedField(null)} onPress={() => setPressedField('password')} />
-                    <Field setValidated={(value) => setConfirmPasswordValidated(value)} password={password} icon="md-lock" label="CONFIRM PASSWORD" pressed={pressedField === 'confirmPassword' ? true : false} onComplete={() => setPressedField(null)} onPress={() => setPressedField('confirmPassword')} />
+                    <Field
+                        setName={text => setName(text)}
+                        setValidated={(value) => setNameValidated(value)}
+                        icon="md-person"
+                        label="FULL NAME"
+                        pressed={pressedField === 'name' ? true : false}
+                        onComplete={() => setPressedField(null)}
+                        onPress={() => setPressedField('name')}
+                    />
+                    <Field
+                        setEmail={text => setEmail(text)}
+                        setValidated={(value) => setEmailValidated(value)}
+                        icon="md-mail"
+                        label="EMAIL"
+                        pressed={pressedField === 'email' ? true : false}
+                        onComplete={() => setPressedField(null)}
+                        onPress={() => setPressedField('email')}
+                    />
+                    <Field
+                        setPassword={(text) => setPassword(text)}
+                        setValidated={(value) => setPasswordValidated(value)}
+                        icon="md-lock"
+                        label="PASSWORD"
+                        pressed={pressedField === 'password' ? true : false}
+                        onComplete={() => setPressedField(null)}
+                        onPress={() => setPressedField('password')}
+                    />
+                    <Field
+                        setValidated={(value) => setConfirmPasswordValidated(value)}
+                        password={password}
+                        icon="md-lock"
+                        label="CONFIRM PASSWORD"
+                        pressed={pressedField === 'confirmPassword' ? true : false}
+                        onComplete={() => setPressedField(null)}
+                        onPress={() => setPressedField('confirmPassword')}
+                    />
                 </View>
 
                 <View style={styles.buttonsContainer}>
                     <TouchableOpacity activeOpacity={passwordValidated && emailValidated && nameValidated && confirmPasswordValidated ? .7 : 1.0} onPress={submitButtonHandler} >
                         <View style={passwordValidated && emailValidated && nameValidated && confirmPasswordValidated ? { ...styles.button, opacity: 1.0 } : { ...styles.button, opacity: .3 }}><Text style={styles.buttonText}>SIGN UP</Text></View>
                     </TouchableOpacity>
-                    {loading ? <ActivityIndicator color="white" /> : null}
+                    {loading ? <MaterialIndicator size={20} color={Colors.accent} style={{ alignSelf: 'center' }} /> : null}
                     <View style={{ flexDirection: 'row', marginBottom: '10%' }}>
-                        <Text style={{ color: 'white', marginRight: 5, fontFamily: 'TTN-Bold' }}>Already have an account?</Text>
-                        <TouchableOpacity onPress={() => props.setVisible(true)}><Text style={{ color: Colors.accent, fontFamily: 'TTN-Bold' }}>Sign in</Text></TouchableOpacity>
+                        <Text style={{ color: 'white', marginRight: 5, fontFamily: 'TTN-Bold', fontSize: wp('4%') }}>Already have an account?</Text>
+                        <TouchableOpacity onPress={() => props.setVisible(true)}><Text style={{ color: Colors.accent, fontFamily: 'TTN-Bold', fontSize: wp('4%') }}>Sign in</Text></TouchableOpacity>
                     </View>
                 </View>
 

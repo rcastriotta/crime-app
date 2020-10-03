@@ -17,15 +17,15 @@ const InDangerModal = props => {
                 <View style={styles.contentContainer}>
                     <Text style={{ color: 'gray', fontFamily: 'TTN-Medium' }}>SELECT ONE</Text>
                     <View style={styles.buttonsContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => props.pressHandler('numbers')}>
+                        <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => props.pressHandler('numbers')}>
                             <Text style={styles.text}>Call emergency number</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.button} onPress={() => props.pressHandler('places')}>
+                        <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => props.pressHandler('places')}>
                             <Text style={styles.text}>Find nearby safe places</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.button} onPress={() => props.pressHandler('SMS')}>
+                        <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => props.pressHandler('SMS')}>
                             <Text style={styles.text}>Send out group SMS alert</Text>
                         </TouchableOpacity>
                     </View>

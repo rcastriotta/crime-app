@@ -1,25 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
-import Swiper from 'react-native-swiper'
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions, Image } from 'react-native';
 
+// EXTERNAL
+import Swiper from 'react-native-swiper'
+import { LinearGradient } from 'expo-linear-gradient';
+
+// COMPONENTS
 import Colors from '../../constants/Colors';
 import SignupScreen from './SignupScreen';
 import LoginScreen from './LoginScreen';
 
-import { Ionicons } from '@expo/vector-icons';
-
-import { LinearGradient } from 'expo-linear-gradient';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
-
-
 const windowWidth = Dimensions.get('window').width;
 
-const WelcomeScreen = ({ navigation }) => {
+const WelcomeScreen = () => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [signupModalVisible, setSignupModalVisible] = useState(false)
     const [loginModalVisible, setLoginModalVisible] = useState(false)
-
     let _swiper = null
 
     const buttonPressHandler = () => {
@@ -27,7 +23,6 @@ const WelcomeScreen = ({ navigation }) => {
             setSignupModalVisible(true)
         }
         _swiper.scrollBy(currentIndex + 1)
-
     }
 
     return (
@@ -55,8 +50,8 @@ const WelcomeScreen = ({ navigation }) => {
 
                 }}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.heading}>Stay safe at all times.</Text>
-                        <Text style={styles.bodyText}>See nearby crimes in your area posted by citizens and by the police. Find nearby safe places. Send out SOS text messages with one click.</Text>
+                        <Text style={styles.heading}>Stay safe at all times</Text>
+                        <Text style={styles.bodyText}>See nearby crimes in your area posted by citizens and by the police. Find nearby safe places. Send out safety alerts.</Text>
                     </View>
 
                 </ImageBackground>
@@ -74,7 +69,7 @@ const WelcomeScreen = ({ navigation }) => {
 
                 }}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.heading}>Reduce levels of crime.</Text>
+                        <Text style={styles.heading}>Reduce levels of crime</Text>
                         <Text style={styles.bodyText}>Help bring the offender(s) to justice to make sure crimes don't get repeated.</Text>
                     </View>
                 </ImageBackground>
@@ -90,18 +85,21 @@ const WelcomeScreen = ({ navigation }) => {
                 }}>
 
                     <View style={styles.textContainer}>
-                        <Text style={styles.heading}>Keep others safe.</Text>
-                        <Text style={styles.bodyText}>File a crime report directly from your smartphone to keep others aware of threats nearby. Over 200,000 crimes posted.</Text>
+                        <Text style={styles.heading}>Keep others safe</Text>
+                        <Text style={styles.bodyText}>File a crime report directly from your smartphone to keep others aware of threats nearby.</Text>
                     </View>
                 </ImageBackground>
 
 
 
+
             </Swiper>
 
-            <Ionicons name={"md-map"} size={100} color={'white'} style={{ position: "absolute", height: '75%' }} />
 
-            <TouchableOpacity style={styles.button} onPress={buttonPressHandler}>
+            <View style={styles.imageContainer}>
+                <Image source={require('../../assets/iconWhite.png')} style={{ width: '100%', height: '100%' }} />
+            </View>
+            <TouchableOpacity style={styles.button} onPress={buttonPressHandler} activeOpacity={0.7}>
                 <LinearGradient colors={['#AB9CFF', Colors.accent]} style={{ width: '100%', height: '100%', borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={styles.buttonText}>{currentIndex === 2 ? 'Get Started' : 'Continue'}</Text>
 
@@ -130,7 +128,8 @@ const WelcomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
-        backgroundColor: Colors.primary
+        justifyContent: 'flex-end',
+        alignItems: 'center'
     },
     imgBackground: {
         width: '100%',
@@ -161,18 +160,15 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
 
     },
-    screen: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        alignItems: 'center'
-    },
+
     buttonText: {
         fontSize: 20,
         fontFamily: 'TTN-Bold',
         color: 'white'
     },
     textContainer: {
-        marginTop: 120
+        marginTop: 120,
+        paddingHorizontal: '5%'
     },
     heading: {
         fontSize: 30,
@@ -190,7 +186,12 @@ const styles = StyleSheet.create({
         lineHeight: 25,
         fontFamily: 'TTN-Medium'
     },
-
+    imageContainer: {
+        position: 'absolute',
+        width: 100,
+        height: 100,
+        bottom: 520
+    }
 
 
 })

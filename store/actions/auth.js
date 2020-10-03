@@ -30,6 +30,7 @@ export const signup = (email, password, name) => {
         await Firebase.auth().createUserWithEmailAndPassword(email, password)
             .then(function(result) {
                 // update name 
+                name = name.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase() })
                 result.user.updateProfile({
                     displayName: name
                 }).catch((err) => {
@@ -54,7 +55,6 @@ export const signup = (email, password, name) => {
 
             })
             .catch(function(err) {
-                // we need to delete account 
                 throw (err)
             });
 

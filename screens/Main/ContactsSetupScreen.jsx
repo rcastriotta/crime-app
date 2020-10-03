@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 
+// EXTERNAL
 import { Ionicons } from '@expo/vector-icons';
-
 import * as Contacts from 'expo-contacts';
-
-import Colors from '../../constants/Colors';
 
 // COMPONENTS
 import SelectContacts from '../../components/Main/SelectContacts';
+import Colors from '../../constants/Colors';
+
+// REDUX
+import * as authActions from '../../store/actions/auth';
+import { useDispatch } from 'react-redux';
 
 const ContactsSetupScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false)
     const [contactsList, setContactsList] = useState([])
+    const dispatch = useDispatch();
 
     const getContacts = async () => {
         //will only run if permissions need to be verified
@@ -53,7 +57,10 @@ const ContactsSetupScreen = ({ navigation }) => {
 
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity onPress={getContacts} style={styles.buttonFiled}><Text style={{ ...styles.buttonText, color: 'white' }}>Add</Text></TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.button}><Text style={{ ...styles.buttonText, color: Colors.accent }}>Skip</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('Home')
+                    dispatch(authActions.setupComplete())
+                }} style={styles.button}><Text style={{ ...styles.buttonText, color: Colors.accent }}>Skip</Text></TouchableOpacity>
             </View>
             <SelectContacts screen={"Home"} navigation={navigation} setVisible={() => setModalVisible(false)} visible={modalVisible} data={contactsList} />
         </SafeAreaView>

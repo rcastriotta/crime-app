@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 100,
         height: '30%',
-        width: '6.5%',
+        aspectRatio: 1,
         borderColor: 'gray'
     },
     textContainer: {
@@ -68,9 +68,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white'
     },
-    noProfileImage: {
-
-    }
 })
 
 export default Contact;

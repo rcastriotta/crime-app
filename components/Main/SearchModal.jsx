@@ -1,22 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, StyleSheet, Text, Button, SafeAreaView, TextInput, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { Modal, View, StyleSheet, Text, Button, SafeAreaView, TextInput, FlatList, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 
 // EXTERNAL
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 // COMPONENTS
 import Colors from '../../constants/Colors';
+
+// REDUX
+import { useSelector } from 'react-redux';
 
 const SearchModal = props => {
     const [searchText, setSearchText] = useState('')
     const [results, setResults] = useState([])
 
+
     useEffect(() => {
         (async () => {
             try {
-                const result = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&language=pt_BR&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
-                const addresses = result.data.predictions.map((address) => {
+                let results;
+                if (props.isAdding) {
+                    const result1 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&language=pt_BR&location=${props.lat},${props.lon}&radius=1600&strictbounds&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
+                    const result2 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=establishment&language=pt_BR&location=${props.lat},${props.lon}&radius=1600&strictbounds&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
+                    results = [...result1.data.predictions, ...result2.data.predictions]
+                } else {
+                    const result1 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&language=pt_BR&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
+                    results = [...result1.data.predictions]
+                }
+
+                const addresses = results.map((address) => {
                     return {
                         ...address,
                         description: address.description.replace(', EUA', '')
@@ -32,8 +46,7 @@ const SearchModal = props => {
     const onLocationPress = async (address) => {
 
         // we should first check if EAU is there
-        const formattedAddress = address.replace(', EUA', '').replace(' ', '+')
-
+        const formattedAddress = address.replace(/ /g, '+')
         try {
             const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${formattedAddress}&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
             const latLngObj = response.data.results[0].geometry.location
@@ -41,14 +54,12 @@ const SearchModal = props => {
             setResults([])
             props.setVisible()
             props.locationChange(latLngObj, address)
-
         } catch {
 
         }
     }
 
     const renderSearchItems = (itemData) => {
-
         return (
             <TouchableWithoutFeedback onPress={() => onLocationPress(itemData.item.description)}>
                 <View style={styles.searchItemContainer} id={itemData.item.reference}>
@@ -58,7 +69,7 @@ const SearchModal = props => {
                     </View>
 
                     <View style={styles.descriptionContainer}>
-                        <Text style={{ color: 'white' }}>{itemData.item.description}</Text>
+                        <Text style={{ color: 'white', fontFamily: 'TTN-Medium' }}>{itemData.item.description}</Text>
                     </View>
                 </View>
             </TouchableWithoutFeedback>
@@ -70,12 +81,16 @@ const SearchModal = props => {
             <SafeAreaView style={styles.screen}>
                 <View style={styles.searchBar}>
                     <View style={styles.textInputContainer}>
-                        <TextInput onChangeText={text => setSearchText(text)} autoFocus={true} keyboardAppearance={'dark'} color={'white'} />
+                        <TextInput onChangeText={text => setSearchText(text)} autoFocus={true} autoCorrect={false} keyboardAppearance={'dark'} color={'white'} style={{ fontFamily: 'TTN-Medium' }} />
                     </View>
-                    <Button title={'Cancel'} color="white" onPress={() => {
+                    <TouchableOpacity activeOpacity={1.0} onPress={() => {
                         props.setVisible()
                         setResults([])
-                    }} />
+                    }}>
+                        <Text style={styles.cancelButton}>Cancel</Text>
+                    </TouchableOpacity>
+
+
 
                 </View>
                 <FlatList data={results} keyExtractor={item => item.reference} renderItem={renderSearchItems} contentContainerStyle={{ paddingTop: '2%' }} />
@@ -91,14 +106,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     searchBar: {
-
         flexDirection: 'row',
         alignItems: 'center',
         height: '10%',
         justifyContent: 'space-between',
         paddingHorizontal: '5%',
-        borderBottomColor: '#727272',
-        borderBottomWidth: .2
+        borderBottomColor: 'rgba(255, 255, 255, .2)',
+        borderBottomWidth: 1
     },
     textInputContainer: {
         width: '75%',
@@ -106,8 +120,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         alignSelf: 'center',
         borderRadius: 10,
-        borderColor: '#727272',
-        borderWidth: .3,
+        borderColor: 'rgba(255, 255, 255, .2)',
+        borderWidth: 1,
         justifyContent: 'center',
         paddingLeft: '5%'
     },
@@ -116,16 +130,23 @@ const styles = StyleSheet.create({
         height: 70,
         alignItems: 'center',
         flexDirection: 'row',
-        marginLeft: '5%'
+        marginLeft: '5%',
+        paddingRight: '5%'
     },
     descriptionContainer: {
         marginLeft: '8%',
         height: '100%',
         width: '100%',
-        borderBottomWidth: .2,
-        borderBottomColor: '#727272',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, .2)',
         justifyContent: 'center',
 
+    },
+    cancelButton: {
+        color: 'white',
+        fontFamily: 'TTN-Medium',
+        marginRight: '2%',
+        fontSize: wp('4.3%')
     }
 });
 

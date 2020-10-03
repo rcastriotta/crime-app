@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Dimensions } from 'react-native';
 
 // COMPONENTS
@@ -12,13 +12,23 @@ import { MaterialIndicator } from 'react-native-indicators';
 
 
 // REDUX
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const NearbyReportsScreen = () => {
     const crimes = useSelector(state => state.crimes.nearbyCrimes)
+    const location = useSelector(state => state.location.currentLocation)
+    const [orderedCrimes, setOrderedCrimes] = useState(null)
+
+    useEffect(() => {
+        if (crimes) {
+            setOrderedCrimes(crimes.sort(function (x, y) {
+                return y.reportedAt - x.reportedAt;
+            }))
+        }
+    }, [crimes])
 
     const renderCrime = (itemData) => {
         return (
@@ -30,7 +40,9 @@ const NearbyReportsScreen = () => {
                 type={itemData.item.type}
                 timeSinceReport={itemData.item.formattedDate}
                 authorName={itemData.item.authorName}
-                styles={{ ...styles.crimeReport }} />
+                authorId={itemData.item.authorId}
+                styles={{ ...styles.crimeReport }}
+            />
         )
     }
     return (
@@ -42,8 +54,8 @@ const NearbyReportsScreen = () => {
             </View>
             <View>
                 {crimes
-                    ? <FlatList data={crimes} renderItem={renderCrime} contentContainerStyle={{ paddingHorizontal: '5%', paddingTop: hp('3%'), paddingBottom: hp('10%') }} />
-                    : <MaterialIndicator size={20} color={Colors.accent} style={{}} />}
+                    ? <FlatList data={orderedCrimes} renderItem={renderCrime} contentContainerStyle={{ paddingHorizontal: '5%', paddingTop: hp('3%'), paddingBottom: hp('10%') }} />
+                    : !location ? <Text style={styles.noLocationText}>Couldn't get current location</Text> : <MaterialIndicator size={20} color={Colors.accent} style={{ marginBottom: '50%' }} />}
 
 
             </View>
@@ -83,6 +95,11 @@ const styles = StyleSheet.create({
         marginTop: 0,
         padding: 20,
         marginBottom: hp('3%')
+    },
+    noLocationText: {
+        fontFamily: 'TTN-Medium',
+        color: Colors.accent,
+        marginTop: '70%'
     }
 })
 

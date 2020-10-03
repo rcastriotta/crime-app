@@ -1,11 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Image, } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../../constants/Colors';
 
+// COMPONENTS
+import Firebase from '../../api/firebase/config';
+import { convertSpeed } from 'geolib';
 
 const CrimeReport = props => {
+    const [imageUrl, setImageUrl] = useState(null)
+    const componentIsMounted = useRef(true)
+
+    useEffect(() => {
+        // when component is unmounted this return is called
+        return () => {
+            componentIsMounted.current = false
+        }
+    }, [])
+
+    useEffect(() => {
+        if (props.authorName) {
+            (async () => {
+                Firebase.storage().ref().child(`${props.authorId}/profilePicture/profile.jpg`).getDownloadURL().then(function (url) {
+                    if (componentIsMounted.current) {
+                        setImageUrl(url)
+                    }
+                }).catch(function (error) {
+                    return
+                });
+            })();
+        }
+
+    }, [])
+
     return (
         <View style={{ ...styles.container, ...props.styles }}>
             <View>
@@ -32,7 +60,11 @@ const CrimeReport = props => {
                         </View>
                         : <View style={styles.authorContainer}>
                             <View style={styles.imageContainer}>
-                                <Image style={{ height: '100%', width: '100%', marginLeft: -4 }} source={require('../../assets/images/userProfile.png')} />
+                                {imageUrl
+                                    ? <Image style={{ height: '100%', width: '100%', marginLeft: -4, borderRadius: 100 }} source={{ uri: imageUrl }} />
+                                    : <Image style={{ height: '100%', width: '100%', marginLeft: -4 }} source={require('../../assets/images/userProfile.png')} />
+                                }
+
                             </View>
                             <Text style={{ ...styles.authorText, color: 'white', marginLeft: '3%', fontWeight: 'normal' }}>{props.authorName}</Text>
                         </View>

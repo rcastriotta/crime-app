@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, Alert } from 'react-native';
 
 // DATABASE
 import firebase from 'firebase';
 const geofirestore = require('geofirestore');
 const GeoFirestore = geofirestore.initializeApp(Firebase.firestore());
-import moment from 'moment'
 
 // EXTERNAL
 import { Ionicons } from '@expo/vector-icons';
@@ -14,50 +13,77 @@ import { MaterialIndicator } from 'react-native-indicators';
 
 
 // REDUX
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import * as crimeReportsActions from '../../../store/actions/crimeReports';
+import * as userActions from '../../../store/actions/user';
 
 // COMPONENTS
 import Colors from '../../../constants/Colors';
 import Fields from './Fields';
 import MapPreview from './MapPreview';
 import SearchModal from '../../../components/Main/SearchModal';
+import checkIfLargeCity from '../../../utils/checkIfLargeCity';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+
 
 const AddCrimeScreen = ({ navigation, route }) => {
     const location = useSelector(state => state.location.currentLocation)
     const [modalVisible, setModalVisible] = useState(false)
     const [chosenLocation, setChosenLocation] = useState(location)
-    const [chosenAddress, setChosenAddress] = useState(`${chosenLocation.name}, ${chosenLocation.city}, ${chosenLocation.region}`)
+    const [chosenAddress, setChosenAddress] = useState(chosenLocation ? `${chosenLocation.name}, ${chosenLocation.city}, ${chosenLocation.region}` : `Couldn't get location`)
     const [descriptionText, setDescriptionText] = useState('')
     const [isUploading, setIsUploading] = useState(false)
     const authorId = useSelector(state => state.user.uid)
     const authorName = useSelector(state => state.user.name)
-    const authorProfileImg = useSelector(state => state.user.profileImg) // this will be either null or firebase storage url
+    const [validated, setValidated] = useState(false)
+    const lastReportedAt = useSelector(state => state.user.lastReportedAt)
 
-
+    const dispatch = useDispatch()
     const uploadCrime = async () => {
-        if (descriptionText.length > 3) {
+        const oneDay = 60 * 60 * 24 * 1000;
+        const canPost = (new Date() - lastReportedAt) > oneDay
+
+        // check if it's been more than a day since last upload
+        if (!canPost) {
+            Alert.alert(
+                "Error posting report",
+                "Please wait 24 hours between posting crime reports",
+                [
+                    { text: "Okay" }
+                ],
+                { cancelable: false }
+            );
+            return;
+        }
+
+        if (validated && location) {
             setIsUploading(true)
-            const crime = {
+            const report = {
                 description: descriptionText,
                 address: chosenAddress,
                 type: route.params.type,
                 authorId,
                 authorName,
-                authorProfileImg,
+                active: true,
                 reportedAt: firebase.firestore.FieldValue.serverTimestamp(),
             }
 
-            const geocollection = GeoFirestore.collection('userCrimes');
-            geocollection.add({ ...crime, coordinates: new firebase.firestore.GeoPoint(chosenLocation.lat, chosenLocation.lng) })
+            const geocollection = GeoFirestore.collection('userReports');
+
+            geocollection.add({ ...report, coordinates: new firebase.firestore.GeoPoint(chosenLocation.lat, chosenLocation.lng) })
                 .then(() => {
-                    setIsUploading(false)
-                    navigation.navigate('Tabbed')
+                    dispatch(userActions.setLastReportTime())
+                    setTimeout(() => {
+                        dispatch(crimeReportsActions.fetchCrimes(location.lat, location.lng, checkIfLargeCity(location.city, location.region), 'homescreen', 20)).then(() => {
+                            setIsUploading(false)
+                            navigation.navigate('Tabbed')
+                        })
+                    }, 500)
+
                 })
                 .catch((err) => console.log(err))
-
         }
     }
 
@@ -72,7 +98,7 @@ const AddCrimeScreen = ({ navigation, route }) => {
                     <Text style={styles.headingText}>{route.params.title}</Text>
                 </View>
                 <Text style={styles.categoryTitle}>DESCRIPTION</Text>
-                <Fields setText={(text) => setDescriptionText(text)} />
+                <Fields setValidated={value => setValidated(location ? value : false)} setText={(text) => setDescriptionText(text)} />
                 <Text style={styles.categoryTitle}>CHOOSE INCIDENT LOCATION</Text>
                 <MapPreview location={chosenLocation} />
                 <View style={styles.currentLocation}>
@@ -80,25 +106,28 @@ const AddCrimeScreen = ({ navigation, route }) => {
                         <Text style={{ color: 'white', fontFamily: 'TTN-Medium' }}>{chosenAddress}</Text>
                     </View>
                     <View style={{ width: '50%', alignItems: 'center', justifyContent: 'center', justifyContent: 'flex-end', flexDirection: 'row' }}>
-                        <TouchableOpacity style={styles.changeLocationButton} onPress={() => setModalVisible(true)}>
+                        <TouchableOpacity style={styles.changeLocationButton} onPress={() => setModalVisible(true)} activeOpacity={1}>
                             <Text style={styles.changeLocationText}>Change location</Text>
                         </TouchableOpacity>
                     </View>
 
                 </View>
-                <TouchableOpacity onPress={uploadCrime} style={styles.submitButton} >
-                    <View style={{ flex: 1 }} />
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={styles.buttonText}>Publish Report</Text>
+                <TouchableOpacity onPress={uploadCrime} activeOpacity={validated ? 0.7 : 1}>
+                    <View style={validated ? styles.submitButton : { ...styles.submitButton, opacity: 0.3 }} >
+                        <View style={{ flex: 1 }} />
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={styles.buttonText}>Publish Report</Text>
+                        </View>
+                        <View style={{ flex: 1 }} >
+                            {isUploading && <MaterialIndicator size={15} color={'white'} style={{ alignSelf: 'flex-start' }} />}
+                        </View>
                     </View>
-                    <View style={{ flex: 1 }} >
-                        {isUploading && <MaterialIndicator size={15} color={'white'} style={{ alignSelf: 'flex-start' }} />}
-                    </View>
+
                 </TouchableOpacity>
             </View>
-            <SearchModal locationChange={(newLocation, address) => {
+            <SearchModal isAdding={true} lat={location && location.lat.toString()} lon={location && location.lng.toString()} locationChange={(newLocation, address) => {
                 setChosenLocation(newLocation)
-                setChosenAddress(address)
+                setChosenAddress(address.replace(', USA', '').replace(/\d{5}/, ''))
             }} setVisible={() => setModalVisible(false)} visible={modalVisible} />
 
         </SafeAreaView>
@@ -129,6 +158,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontFamily: 'TTN-Bold',
+        fontSize: wp('4%')
     },
     currentLocation: {
         flexDirection: 'row',
@@ -150,7 +180,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         width: '100%',
-        height: '8%',
+        aspectRatio: 5.3,
         backgroundColor: Colors.accent,
         borderRadius: 10,
         flexDirection: 'row',

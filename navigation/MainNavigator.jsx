@@ -102,7 +102,7 @@ const TabbedNav = () => {
                     }}>
                         <Ionicons name="md-add"
                             size={25} color={'white'}
-                            style={{ marginTop: 3 }}
+                            style={{ marginTop: 3, marginLeft: .5 }}
                         />
                     </View>
 

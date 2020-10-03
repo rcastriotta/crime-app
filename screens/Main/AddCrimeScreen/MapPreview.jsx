@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 // Components
 import Colors from '../../../constants/Colors';
@@ -15,7 +15,7 @@ const MapPreview = props => {
 
     return (
         <View style={styles.mapPreview}>
-            {props.location ? <Image style={styles.mapImage} source={{ uri: imagePreviewUrl }} /> : props.children}
+            {props.location ? <Image style={styles.mapImage} source={{ uri: imagePreviewUrl }} /> : <View style={{ ...styles.mapImage, backgroundColor: Colors.secondary }} />}
         </View>
     )
 };
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     mapImage: {
         width: '100%',
         height: '100%',
-        borderRadius: 15
+        borderRadius: 15,
 
     }
 });

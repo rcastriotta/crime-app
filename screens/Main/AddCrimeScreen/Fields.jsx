@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, TextInput } from 'react-native';
 
 // EXTERNAL
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -7,6 +7,15 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 const Fields = props => {
     const [text, setText] = useState('')
+
+    useEffect(() => {
+        if (text.length > 10) {
+            props.setValidated(true)
+        } else {
+            props.setValidated(false)
+        }
+    }, [text])
+
     return (
         <TextInput
             placeholder="Ex. Man assaulted while buying groceries"
@@ -16,7 +25,7 @@ const Fields = props => {
             numberOfLines={2}
             style={{
                 color: 'white',
-                fontSize: hp('2%'),
+                fontSize: wp('4.4%'),
                 fontFamily: 'TTN-Bold',
                 width: '100%',
                 height: '12%',

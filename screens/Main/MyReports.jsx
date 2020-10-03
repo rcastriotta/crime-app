@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
 
 // COMPONENTS
 import CrimeReport from '../../components/Main/CrimeReport';
@@ -11,6 +11,11 @@ import * as crimeReportActions from '../../store/actions/crimeReports';
 
 // EXTERNAL
 import { Ionicons } from '@expo/vector-icons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const MyReports = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -28,6 +33,7 @@ const MyReports = ({ navigation }) => {
                 authorName={itemData.item.authorName}
                 address={itemData.item.address}
                 timeSinceReport={itemData.item.formattedDate}
+                authorId={itemData.item.authorId}
                 styles={styles.crimeReport} />
         )
     }
@@ -40,9 +46,9 @@ const MyReports = ({ navigation }) => {
                         <Ionicons name={"ios-arrow-back"} size={28} color={Colors.accent} style={{ marginTop: '1%', marginLeft: 20 }} />
                     </TouchableOpacity>
                 </View>
-                {myReports.length === 0
+                {myReports && myReports.length === 0
                     ? <Text style={styles.noReportsText}>You haven't posted any reports. Post one now!</Text>
-                    : <FlatList data={myReports} renderItem={renderCrimeReport} contentContainerStyle={{ flex: 1, paddingHorizontal: 10 }} />
+                    : <FlatList data={myReports} renderItem={renderCrimeReport} contentContainerStyle={{ paddingHorizontal: 10, paddingVertical: 20 }} />
                 }
             </View>
         </SafeAreaView>
@@ -63,11 +69,20 @@ const styles = StyleSheet.create({
     },
 
     crimeReport: {
-        height: 160,
-        marginTop: 20,
-        borderWidth: .2,
-        borderColor: '#5B5B5B',
-        padding: 15
+        backgroundColor: Colors.secondary,
+        alignSelf: 'center',
+        width: '90%',
+        height: windowHeight < 700 ? hp('30%') : hp('23%'),
+        borderRadius: 20,
+        shadowColor: 'black',
+        shadowOpacity: .3,
+        shadowOffset: { width: 0, height: 4 },
+        shadowRadius: 10,
+        marginHorizontal: '2%',
+        width: windowWidth * .96,
+        marginTop: 0,
+        padding: 20,
+        marginBottom: hp('3%')
     },
     noReportsText: {
         color: 'white',

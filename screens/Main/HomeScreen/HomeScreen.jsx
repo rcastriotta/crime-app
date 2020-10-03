@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Image, Dimensions, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions, ScrollView, SafeAreaView } from 'react-native';
 
 // COMPONENTS
 import InDangerModal from './InDangerModal';
@@ -10,9 +8,10 @@ import EmergencyNumbers from './EmergencyNumbers';
 import AnimatedCircle from './AnimatedCircle';
 import ReportsData from './ReportsData';
 import Colors from '../../../constants/Colors';
+import checkIfLargeCity from '../../../utils/checkIfLargeCity';
+import RatingModal from './RatingModal';
 
 // EXTERNAL
-import { Ionicons } from '@expo/vector-icons';
 import * as Permissions from 'expo-permissions';
 import * as SMS from 'expo-sms';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -38,20 +37,22 @@ const HomeScreen = ({ navigation }) => {
     const contacts = useSelector(state => state.user.emergencyContacts)
     const [amount, setAmount] = useState(0)
     const [fetchFailed, setFetchFailed] = useState(false)
+    const [radius, setRadius] = useState(null)
+    const [currentColors, setCurrentColors] = useState({ main: 'gray', backgroundColor: 'rgba(128,128,128,.15)' })
+    const [percentage, setPercentage] = useState(0)
 
     // modals
     const [modalVisible, setModalVisible] = useState(false)
     const [placesModalVisible, setPlacesModalVisible] = useState(false)
     const [numbersModalVisible, setNumbersModalVisible] = useState(false)
-
-
+    const [ratingModalVisible, setRatingModalVisible] = useState(false)
 
     const verifyPermissions = async () => {
         //will only run if permissions need to be verified
         const result = await Permissions.askAsync(Permissions.LOCATION);
         if (result.status !== 'granted') {
-            Alert.alert(`Couldn't get location!`,
-                `Go to settings to grant permissions`, [{ text: 'Okay!' }])
+            Alert.alert(`Please grant location access `,
+                `Go to Settings > Privacy > Location Services`, [{ text: 'Okay' }])
             return false;
         }
         return true;
@@ -61,10 +62,13 @@ const HomeScreen = ({ navigation }) => {
     useEffect(() => {
         if (location) {
             setIsFetching(true)
+            setFetchFailed(false)
             const coordinates = { lat: location.lat, lng: location.lng }
             const city = `${location.name}, ${location.city}, ${location.region}`
             setCurrentCity(city)
-            dispatch(crimeReportsActions.fetchCrimes(coordinates.lat, coordinates.lng, 10, 'timeRange', 'homescreen'))
+            const radius = checkIfLargeCity(location.city, location.region)
+            setRadius(radius)
+            dispatch(crimeReportsActions.fetchCrimes(coordinates.lat, coordinates.lng, radius, 'homescreen', 20))
                 .then(() => {
                     setIsFetching(false)
                 })
@@ -81,7 +85,12 @@ const HomeScreen = ({ navigation }) => {
     useEffect(() => {
         (async () => {
             setIsFetching(true)
-            const hasPermissions = await verifyPermissions();
+            setFetchFailed(false)
+            const hasPermissions = await verifyPermissions()
+            if (!hasPermissions) {
+                setIsFetching(false)
+                return;
+            }
             dispatch(locationActions.getLocation(hasPermissions)).catch((err) => {
                 console.log(err)
             })
@@ -93,10 +102,10 @@ const HomeScreen = ({ navigation }) => {
         const numbers = []
         contacts.forEach(contact => contact.phoneNumbers.forEach(numberInfo => numbers.push(numberInfo.number)))
 
-        const { result } = await SMS.sendSMSAsync(
+        await SMS.sendSMSAsync(
             numbers,
-            `DANGER ALERT: The person contacting you is in danger.\n\nCURRENT LOCATION: ${currentCity}\n\n\nSent via Safety`,
-        )
+            `SAFETY ALERT: The person contacting you is in danger and/or needs your help.\n\nCURRENT LOCATION: ${currentCity}\n\n\nSent via Safety`,
+        ).catch((err) => console.log(err))
     }
 
     const mainModalPressHandler = type => {
@@ -113,8 +122,8 @@ const HomeScreen = ({ navigation }) => {
     }
 
     return (
-        <View style={{ flexGrow: 1 }}>
-            <ScrollView bounces={false} contentContainerStyle={{ height: hp('80%') + (amount * hp('13%')) }}>
+        <View>
+            <ScrollView bounces={false} contentContainerStyle={amount > 1 ? { height: hp('70%') + (amount * (wp('90%') / 2.5)) } : { height: '100%' }}>
                 <SafeAreaView style={styles.screen}>
                     <LinearGradient
                         // Background Linear Gradient
@@ -130,22 +139,28 @@ const HomeScreen = ({ navigation }) => {
                         <View style={{ height: '20%', width: '100%' }}>
                             {isFetching
                                 ? <MaterialIndicator size={15} color={Colors.accent} style={{ alignSelf: 'flex-start' }} />
-                                : <Text style={styles.locationText}>Near {currentCity}</Text>
+                                : !location ? <Text style={styles.locationText}>Unknown</Text> : <Text style={styles.locationText}>Near {currentCity}</Text>
                             }
                         </View>
                     </View>
 
-                    <AnimatedCircle />
-                    <ReportsData setAmount={(num) => setAmount(num)} />
+                    <AnimatedCircle showModal={(percentage, currentColors) => {
+                        setCurrentColors(currentColors)
+                        setPercentage(percentage)
+                        !isFetching && setRatingModalVisible(true)
+                    }}
+                    />
+                    <ReportsData fetchFailed={fetchFailed} isFetching={isFetching} setAmount={(num) => setAmount(num)} radius={radius} />
 
                     <InDangerModal setVisible={() => setModalVisible(false)} visible={modalVisible} pressHandler={mainModalPressHandler} />
-                    <SafePlacesModal visible={placesModalVisible} setVisible={() => setPlacesModalVisible(false)} />
+                    <SafePlacesModal radius={radius} visible={placesModalVisible} setVisible={() => setPlacesModalVisible(false)} />
                     <EmergencyNumbers visible={numbersModalVisible} setVisible={() => setNumbersModalVisible(false)} />
+                    <RatingModal radius={radius} percentage={percentage} currentColors={currentColors} visible={ratingModalVisible} setVisible={() => setRatingModalVisible(false)} />
 
                 </SafeAreaView>
             </ScrollView>
-            <TouchableOpacity style={styles.dangerButton} onPress={() => setModalVisible(true)}>
-                <LinearGradient colors={['#AB9CFF', Colors.accent]} style={{ width: '100%', height: '100%', borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}>
+            <TouchableOpacity activeOpacity={0.7} style={styles.dangerButton} onPress={() => setModalVisible(true)}>
+                <LinearGradient colors={['#AB9CFF', Colors.accent]} style={{ width: '100%', height: '100%', borderRadius: 27, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={styles.buttonText}>In Danger?</Text>
 
                 </LinearGradient>
@@ -171,7 +186,7 @@ const styles = StyleSheet.create({
 
     },
     name: {
-        fontSize: hp('3.5%'),
+        fontSize: wp('7%'),
         color: 'white',
         fontFamily: 'TTN-Medium'
     },
@@ -191,15 +206,15 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'white',
-        fontWeight: 'bold',
-        fontSize: hp('1.8%')
+        fontFamily: 'TTN-Bold',
+        fontSize: wp('4%')
     },
     dangerButton: {
         position: 'absolute',
         flex: 1,
         marginTop: hp('80%'),
-        width: hp('24%'),
-        height: hp('6%'),
+        width: wp('50%'),
+        aspectRatio: 3.6,
         backgroundColor: Colors.accent,
         borderRadius: 100,
         alignItems: 'center',

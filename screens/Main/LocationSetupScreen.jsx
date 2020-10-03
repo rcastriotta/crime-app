@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Alert, Image } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
-
+// EXTERNAL
 import * as Permissions from 'expo-permissions';
 
+// COMPONENTS
 import Colors from '../../constants/Colors';
 
 const LocationSetupScreen = ({ navigation }) => {

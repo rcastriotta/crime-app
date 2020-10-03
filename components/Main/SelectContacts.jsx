@@ -27,7 +27,8 @@ const SelectContacts = props => {
 
 
     const search = (text) => {
-        setCurrentData(data.filter(el => el.name.includes(text)))
+        const properData = data.filter(el => el.name)
+        setCurrentData(properData.filter(el => el.name.toLowerCase().includes(text.toLowerCase())))
     }
 
     const pressHandler = (value, data) => {

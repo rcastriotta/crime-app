@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Dimensions, StyleSheet, Text } from 'react-native';
+import { View, Dimensions, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 
 // COMPONENTS
 import Colors from '../../../constants/Colors';
+import locationRating from '../../../utils/locationRating';
 
 // REDUX
 import { useSelector } from 'react-redux';
@@ -12,12 +13,13 @@ import { useSelector } from 'react-redux';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import grade from 'letter-grade';
+import { useLinkProps } from '@react-navigation/native';
 
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const AnimatedCircle = () => {
+const AnimatedCircle = props => {
     const crimes = useSelector(state => state.crimes.nearbyCrimes)
     const [percentage, setPercentage] = useState(null)
     const [currentColors, setCurrentColors] = useState({ main: 'gray', backgroundColor: 'rgba(128,128,128,.15)' })
@@ -25,28 +27,8 @@ const AnimatedCircle = () => {
 
     useEffect(() => {
         if (crimes) {
-            let rating = 100;
 
-            for (const crime of crimes) {
-                const timeSinceReported = (new Date() - crime.reportedAt) / 86400000
-                if (timeSinceReported < 1) {
-                    rating = rating - 10
-                    continue;
-                } else if (timeSinceReported < 7) {
-                    rating = rating - 5
-                    continue;
-                } else {
-                    rating = rating - 2
-                }
-            }
-
-            // check how recent crimes are
-
-            // check the type of crimes (shooting more unsafe than vehicle theft)
-
-            if (rating <= 0) {
-                rating = 2
-            }
+            const rating = locationRating(crimes)
 
             setPercentage(rating)
             if (rating <= 30) {
@@ -61,42 +43,49 @@ const AnimatedCircle = () => {
             }
         }
     }, [crimes])
+
+    const ratingPressHandler = () => {
+        props.showModal(percentage, currentColors)
+    }
     return (
         <View style={styles.container}>
             <View style={styles.circleContainer}>
-                <AnimatedCircularProgress
-                    size={windowHeight < 700 ? 190 : 210}
-                    width={windowHeight < 700 ? 12 : 14}
-                    fill={percentage ? percentage : 0}
-                    tintColor={currentColors.main}
-                    lineCap={'round'}
-                    rotation={360}
-                    onFillChange={(cur) => console.log(cur)}
+                <TouchableOpacity activeOpacity={1.0} onPress={ratingPressHandler}>
+                    <AnimatedCircularProgress
+                        size={windowHeight < 700 ? 195 : 220}
+                        width={windowHeight < 700 ? 12 : 17}
+                        fill={percentage ? percentage : 0}
+                        tintColor={currentColors.main}
+                        lineCap={'round'}
+                        rotation={360}
+                        backgroundWidth={12}
 
-                    backgroundColor={currentColors.backgroundColor}
-                    style={{
-                        shadowColor: 'black',
-                        shadowOpacity: .2,
-                        shadowOffset: { width: 0, height: 10 },
-                        shadowRadius: 12,
-                    }}
-                    duration={1200}
-                    children={() => {
-                        return (
-                            <View style={{ alignItems: 'center', marginTop: '5%' }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                                    <Text style={{ ...styles.percentage }}>{Math.round(percentage)}%</Text>
-                                    <Text style={styles.safeText}>Safe</Text>
+                        backgroundColor={currentColors.backgroundColor}
+                        style={{
+                            shadowColor: 'black',
+                            shadowOpacity: .2,
+                            shadowOffset: { width: 0, height: 10 },
+                            shadowRadius: 12,
+                        }}
+                        duration={1200}
+                        children={() => {
+                            return (
+                                <View style={{ alignItems: 'center', marginTop: '5%' }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                                        <Text style={{ ...styles.percentage }}>{Math.round(percentage)}%</Text>
+                                        <Text style={styles.safeText}>Safe</Text>
 
+                                    </View>
+                                    <View style={{ height: 30, paddingHorizontal: 20, backgroundColor: currentColors.backgroundColor, alignItems: 'center', justifyContent: 'center', borderRadius: 100, marginTop: 15 }}>
+                                        <Text style={{ color: currentColors.main, fontFamily: 'TTN-Bold', fontSize: 13 }}>{rating ? rating : 'Unknown'}</Text>
+                                    </View>
                                 </View>
-                                <View style={{ height: 30, paddingHorizontal: 20, backgroundColor: currentColors.backgroundColor, alignItems: 'center', justifyContent: 'center', borderRadius: 100, marginTop: 15 }}>
-                                    <Text style={{ color: currentColors.main, fontFamily: 'TTN-Bold', fontSize: 13 }}>{rating ? rating : 'Unknown'}</Text>
-                                </View>
-                            </View>
 
-                        )
-                    }}
-                />
+                            )
+                        }}
+                    />
+                </TouchableOpacity>
+
             </View>
         </View>
     )
@@ -130,7 +119,7 @@ const styles = StyleSheet.create({
     safeText: {
         color: 'gray',
         fontFamily: 'TTN-Medium',
-        fontSize: 15,
+        fontSize: 18,
         color: 'white',
         marginLeft: 5
     },

@@ -4,11 +4,11 @@
         "slug": "crime-app2",
         "version": "1.0.0",
         "orientation": "portrait",
-        "icon": "./assets/icon.png",
+        "icon": "./assets/appIcon.png",
         "splash": {
             "image": "./assets/splash.png",
             "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
+            "backgroundColor": "#111422"
         },
         "updates": {
             "fallbackToCacheTimeout": 0
@@ -28,7 +28,8 @@
             "supportsTablet": true,
             "bundleIdentifier": "com.company",
             "config": {
-                "googleMapsApiKey": "AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88"
+                "googleMapsApiKey": "AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88",
+                "googleMobileAdsAppId": "ca-app-pub-1190322108532531~7339346116"
             }
         },
         "web": {

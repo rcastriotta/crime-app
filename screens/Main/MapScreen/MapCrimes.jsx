@@ -18,21 +18,19 @@ const windowHeight = Dimensions.get('window').height;
 
 const MapCrimes = props => {
     let _swiper = null
-    const [scrollEnabled, setScrollEnabled] = useState(true)
-    const [ref, setRef] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
 
     const renderLocations = crime => {
         return (
             <CrimeReport
                 key={crime.id}
-                setRef={(ref) => setRef(ref)}
                 description={crime.description}
                 // setSelected={() => setCrimeSelected(null)}
                 address={crime.address}
                 type={crime.type}
                 timeSinceReport={crime.formattedDate}
                 authorName={crime.authorName}
+                authorId={crime.authorId}
                 styles={{ ...styles.crimeReport }} />
         )
     }
@@ -43,7 +41,7 @@ const MapCrimes = props => {
         return (
             <View style={styles.swiperContainer}>
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity containerStyle={{ overflow: 'visible' }} style={styles.exit} onPress={() => props.setCrimeSelected()}>
+                    <TouchableOpacity activeOpacity={0.7} containerStyle={{ overflow: 'visible' }} style={styles.exit} onPress={() => props.setCrimeSelected()}>
                         <Ionicons name={"md-close"} size={28} color={'white'} style={{ marginTop: '6%' }} />
                     </TouchableOpacity>
 
@@ -62,7 +60,6 @@ const MapCrimes = props => {
                     bounces={true}
                     loop={false}
                     ref={(swiper) => { _swiper = swiper }}
-                    scrollEnabled={scrollEnabled}
 
                 >
                     {props.selected.map(crime => renderLocations(crime))}
@@ -79,7 +76,7 @@ const MapCrimes = props => {
         <View style={styles.swiperContainer}>
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity containerStyle={{ overflow: 'visible' }} style={styles.exit} onPress={() => props.setCrimeSelected()}>
+                <TouchableOpacity activeOpacity={0.7} containerStyle={{ overflow: 'visible' }} style={styles.exit} onPress={() => props.setCrimeSelected()}>
                     <Ionicons name={"md-close"} size={28} color={'white'} style={{ marginTop: '6%' }} />
                 </TouchableOpacity>
 
@@ -93,6 +90,7 @@ const MapCrimes = props => {
                 type={props.selected.type}
                 timeSinceReport={props.selected.formattedDate}
                 authorName={props.selected.authorName}
+                authorId={props.selected.authorId}
                 styles={styles.crimeReport} />
         </View>
 

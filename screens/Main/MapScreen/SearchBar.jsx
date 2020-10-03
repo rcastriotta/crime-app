@@ -1,10 +1,12 @@
-
-
 import React from 'react';
-import { View, Text, TouchableOpacity, Button, StyleSheet, Dimensions, TouchableWithoutFeedback, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
 
 // EXTERNAL
 import { Ionicons } from '@expo/vector-icons';
+import { MaterialIndicator } from 'react-native-indicators';
+
+// COMPONENTS
+import Colors from '../../../constants/Colors';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -21,6 +23,9 @@ const SearchBar = props => {
                         <Ionicons name={"md-search"} size={20} color={'white'} />
                         <Text style={styles.text}>Search places</Text>
                     </View>
+                    {props.isFetching
+                        ? <MaterialIndicator size={15} color={Colors.accent} />
+                        : <Text style={styles.radiusText}>reports within {props.radius ? props.radius : 0.5} mi</Text>}
                 </View>
             </TouchableOpacity>
         </SafeAreaView>
@@ -31,7 +36,7 @@ const styles = StyleSheet.create({
     container: {
         width: windowWidth * .9,
         height: '60%',
-        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
         alignSelf: 'center',
         borderRadius: 10,
         marginTop: '5%',
@@ -41,17 +46,26 @@ const styles = StyleSheet.create({
         shadowOpacity: .5,
         shadowOffset: { width: 0, height: 4 },
         shadowRadius: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingRight: '5%',
+
 
     },
     textContainer: {
         alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        paddingLeft: '5%'
+        paddingLeft: '5%',
     },
     text: {
         color: 'white',
-        marginLeft: 10
+        marginLeft: 10,
+        fontFamily: 'TTN-Medium',
+    },
+    radiusText: {
+        color: Colors.accent,
+        fontFamily: 'TTN-Bold'
     }
 })
 

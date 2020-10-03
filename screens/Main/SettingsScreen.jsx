@@ -1,30 +1,44 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, Button, SafeAreaView, Image, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, TouchableWithoutFeedback } from 'react-native';
 
 // COMPONENTS
 import Colors from '../../constants/Colors';
 import SelectContacts from '../../components/Main/SelectContacts';
+import Firebase from '../../api/firebase/config';
 
 // EXTERNAL
-import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import * as Contacts from 'expo-contacts';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
+import { MaterialIndicator } from 'react-native-indicators';
+import * as ImageManipulator from "expo-image-manipulator";
 
 // REDUX
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import * as authActions from '../../store/actions/auth';
-import * as userActions from '../../store/actions/user';
 
 const SettingsModal = ({ navigation }) => {
     const name = useSelector(state => state.user.name)
     const email = useSelector(state => state.user.email)
+    const uid = useSelector(state => state.user.uid)
     const [modalVisible, setModalVisible] = useState(false)
     const [contactsList, setContactsList] = useState([])
-    const profileImg = useSelector(state => state.user.profileImg)
-    const dispatch = useDispatch()
+    const [imageUploading, setImageUploading] = useState(false)
+    const [profilePic, setProfilePic] = useState(null)
 
+    const fetchMyProfileImage = () => {
+        Firebase.storage().ref().child(`${uid}/profilePicture/profile.jpg`).getDownloadURL().then(function (url) {
+            setProfilePic(url)
+
+        }).catch(function () {
+            setProfilePic(false)
+        });
+    }
+
+    useEffect(() => {
+        fetchMyProfileImage()
+    }, [])
 
     const verifyPermissions = async () => {
         //will only run if permissions need to be verified
@@ -37,6 +51,17 @@ const SettingsModal = ({ navigation }) => {
         return true;
     }
 
+    const uriToBlob = async (uri) => {
+        try {
+            const fetchResponse = await fetch(uri);
+            const blob = await fetchResponse.blob();
+            // console.log(blob)
+            return blob
+        } catch (error) {
+            console.log('ERR: ' + error.message);
+        }
+    }
+
     const getImageHandler = async () => {
         const hasPermission = await verifyPermissions();
         if (!hasPermission) {
@@ -46,11 +71,28 @@ const SettingsModal = ({ navigation }) => {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [16, 9],
-            quality: 0.5
+            quality: 1.0
         });
 
         if (image.uri) {
-            dispatch(userActions.updateProfileImage(image.uri))
+            const manipResult = await ImageManipulator.manipulateAsync(
+                image.uri,
+                [],
+                { compress: 0.0, format: ImageManipulator.SaveFormat.JPG }
+            );
+
+            setImageUploading(true)
+            const blob = await uriToBlob(manipResult.uri);
+            const storageRef = Firebase.storage().ref(`${uid}/profilePicture/profile.jpg`);
+            storageRef.put(blob)
+                .then(function () {
+                    setImageUploading(false)
+                    fetchMyProfileImage()
+                })
+                .catch((error) => {
+                    setImageUploading(false)
+                    console.log(error)
+                });
         }
     };
 
@@ -82,9 +124,12 @@ const SettingsModal = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.screen}>
             <View style={styles.container}>
-                <TouchableWithoutFeedback onPress={getImageHandler}>
-                    <Image source={profileImg ? { uri: profileImg } : require('../../assets/images/userProfile.png')} style={styles.image} />
-                </TouchableWithoutFeedback>
+                <TouchableOpacity activeOpacity={1.0} onPress={getImageHandler} style={styles.imageContainer}>
+                    {imageUploading || profilePic === null
+                        ? <MaterialIndicator size={20} color={Colors.accent} />
+                        : <Image source={profilePic ? { uri: profilePic } : require('../../assets/images/userProfile.png')} style={styles.image} />
+                    }
+                </TouchableOpacity>
                 <View style={styles.textBox}>
                     <Text style={styles.name}>{name}</Text>
                     <Text style={styles.email}>{email}</Text>
@@ -143,11 +188,19 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         width: '100%',
     },
+    imageContainer: {
+        borderWidth: 2,
+        borderColor: Colors.accent,
+        borderRadius: 100,
+        width: '50%',
+        aspectRatio: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     image: {
-        width: 130,
-        height: 130,
+        width: '100%',
+        height: '100%',
         borderRadius: 100
-
     },
     textBox: {
         height: '8%',
