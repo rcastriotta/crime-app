@@ -5,7 +5,7 @@ import Firebase from '../../api/firebase/config';
 // export const UPDATE_NAME = 'UPDATE_PASSWORD'; --- soon
 export const ADD_CONTACTS = 'ADD_CONTACTS';
 export const UPDATE_EMAIL = 'UPDATE_EMAIL';
-export const SET_LAST_REPORT_TIME = 'UPDATE_LAST_REPORT_TIME';
+export const SET_LAST_REPORT_TIME = 'SET_LAST_REPORT_TIME';
 
 
 export const addContacts = (contacts) => {

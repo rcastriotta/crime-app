@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Dimensions, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 
 // COMPONENTS
-import Colors from '../../../constants/Colors';
 import locationRating from '../../../utils/locationRating';
 
 // REDUX
@@ -12,8 +11,6 @@ import { useSelector } from 'react-redux';
 // EXTERNAL
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import grade from 'letter-grade';
-import { useLinkProps } from '@react-navigation/native';
 
 
 const windowWidth = Dimensions.get('window').width;

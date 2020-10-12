@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ActivityIndicator, TouchableHighlight, Alert, ImagePropTypes } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
-import MapStyles from '../../../constants/MapStyles';
 
 // REDUX 
 import { useDispatch, useSelector } from 'react-redux'
 import * as crimeReportsActions from '../../../store/actions/crimeReports';
-import * as locationActions from '../../../store/actions/location';
 
 // EXTERNAL
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
-import * as Permissions from 'expo-permissions';
 import { AdMobInterstitial } from 'expo-ads-admob';
 
 //COMPONENTS
@@ -18,6 +15,7 @@ import SearchBar from './SearchBar';
 import SearchModal from '../../../components/Main/SearchModal';
 import MapCrimes from './MapCrimes';
 import checkIfLargeCity from '../../../utils/checkIfLargeCity';
+import MapStyles from '../../../constants/MapStyles';
 
 import Colors from '../../../constants/Colors';
 
@@ -30,7 +28,7 @@ const MapScreen = () => {
     const [mapRef, setMapRef] = useState(null)
     const [currentRadius, setCurrentRadius] = useState(null)
     const [changedRegion, setChangedRegion] = useState(null)
-    const [circleStyles, setCircleStyles] = useState(null)
+    const [circleRef, setCircleRef] = useState(null)
 
 
     useEffect(() => {
@@ -68,8 +66,8 @@ const MapScreen = () => {
             radius = checkIfLargeCity(location.city, location.region)
             setCurrentRadius(radius)
         } else {
-            setCurrentRadius(0.5)
             radius = 0.5
+            setCurrentRadius(radius)
         }
         await dispatch(crimeReportsActions.fetchCrimes(coordinates.lat, coordinates.lng, radius, 'mapScreen', 100)).catch((err) => {
             console.log(err)
@@ -85,11 +83,6 @@ const MapScreen = () => {
 
     // on first load
     useEffect(() => {
-        setCircleStyles({
-            strokeWidth: 1,
-            strokeColor: 'rgba(127, 106, 250, .5)',
-            fillColor: 'rgba(127, 106, 250, .08)'
-        })
 
         showAd();
 
@@ -138,6 +131,14 @@ const MapScreen = () => {
         )
     }
 
+    const circleLayout = () => {
+        circleRef.setNativeProps({
+            strokeWidth: 1,
+            strokeColor: 'rgba(127, 106, 250, .5)',
+            fillColor: 'rgba(127, 106, 250, .08)'
+        })
+    }
+
     return (
         <View style={{ flex: 1 }} >
             <MapView
@@ -145,7 +146,7 @@ const MapScreen = () => {
                 showsUserLocation
                 customMapStyle={MapStyles}
                 style={styles.map}
-                minZoomLevel={14}  // default => 0
+                minZoomLevel={14.5}  // default => 0
                 maxZoomLevel={20} // default => 20
 
                 initialRegion={{
@@ -163,10 +164,9 @@ const MapScreen = () => {
                         latitude: changedRegion ? changedRegion.latitude : location ? location.lat : 40.7127753,
                         longitude: changedRegion ? changedRegion.longitude : location ? location.lng : -74.0059728
                     }}
-                    radius={currentRadius ? (currentRadius * 1600) : 800}
-                    strokeWidth={circleStyles && circleStyles.strokeWidth}
-                    strokeColor={circleStyles && circleStyles.strokeColor}
-                    fillColor={circleStyles && circleStyles.fillColor}
+                    onLayout={circleLayout}
+                    radius={currentRadius ? (currentRadius * 1609) : 804}
+                    ref={ref => setCircleRef(ref)}
                 />
 
 

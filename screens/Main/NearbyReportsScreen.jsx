@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, RefreshControl } from 'react-native';
 
 // COMPONENTS
 import Colors from '../../constants/Colors';
 import CrimeReport from '../../components/Main/CrimeReport';
+import checkIfLargeCity from '../../utils/checkIfLargeCity';
 
 
 // EXTERNAL
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIndicator } from 'react-native-indicators';
+import { SafeAreaView } from 'react-navigation';
 
 
 // REDUX
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import * as crimeReportsActions from '../../store/actions/crimeReports';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -21,6 +24,8 @@ const NearbyReportsScreen = () => {
     const crimes = useSelector(state => state.crimes.nearbyCrimes)
     const location = useSelector(state => state.location.currentLocation)
     const [orderedCrimes, setOrderedCrimes] = useState(null)
+    const [isFetching, setIsFetching] = useState(false)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         if (crimes) {
@@ -30,12 +35,25 @@ const NearbyReportsScreen = () => {
         }
     }, [crimes])
 
+    const fetchCrimes = () => {
+        setIsFetching(true)
+        const radius = checkIfLargeCity(location.city, location.region)
+        dispatch(crimeReportsActions.fetchCrimes(location.lat, location.lng, radius, 'homescreen', 20))
+            .then(() => {
+                setIsFetching(false)
+            })
+            .catch((err) => {
+                setIsFetching(false)
+                console.log(err)
+            })
+    }
+
     const renderCrime = (itemData) => {
         return (
             <CrimeReport
                 key={itemData.item.id}
+                refreshed={true}
                 description={itemData.item.description}
-                // setSelected={() => setCrimeSelected(null)}
                 address={itemData.item.address}
                 type={itemData.item.type}
                 timeSinceReport={itemData.item.formattedDate}
@@ -54,7 +72,15 @@ const NearbyReportsScreen = () => {
             </View>
             <View>
                 {crimes
-                    ? <FlatList data={orderedCrimes} renderItem={renderCrime} contentContainerStyle={{ paddingHorizontal: '5%', paddingTop: hp('3%'), paddingBottom: hp('10%') }} />
+                    ? <FlatList
+                        data={orderedCrimes}
+                        refreshControl={<RefreshControl
+                            tintColor={Colors.accent}
+                            refreshing={isFetching}
+                            onRefresh={() => fetchCrimes()} />}
+                        renderItem={renderCrime}
+                        contentContainerStyle={{ paddingHorizontal: '5%', paddingTop: hp('3%'), paddingBottom: hp('10%') }}
+                    />
                     : !location ? <Text style={styles.noLocationText}>Couldn't get current location</Text> : <MaterialIndicator size={20} color={Colors.accent} style={{ marginBottom: '50%' }} />}
 
 
@@ -65,7 +91,6 @@ const NearbyReportsScreen = () => {
 
 const styles = StyleSheet.create({
     topContainer: {
-        // justifyContent: 'space-between',
         width: wp('90%'),
         height: hp('10%'),
         justifyContent: 'space-evenly'

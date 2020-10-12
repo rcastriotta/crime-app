@@ -10,6 +10,7 @@ const GeoFirestore = geofirestore.initializeApp(Firebase.firestore());
 import { Ionicons } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIndicator } from 'react-native-indicators';
+import axios from 'axios';
 
 
 // REDUX
@@ -40,25 +41,53 @@ const AddCrimeScreen = ({ navigation, route }) => {
     const [validated, setValidated] = useState(false)
     const lastReportedAt = useSelector(state => state.user.lastReportedAt)
 
-    const dispatch = useDispatch()
-    const uploadCrime = async () => {
-        const oneDay = 60 * 60 * 24 * 1000;
-        const canPost = (new Date() - lastReportedAt) > oneDay
-
-        // check if it's been more than a day since last upload
-        if (!canPost) {
-            Alert.alert(
-                "Error posting report",
-                "Please wait 24 hours between posting crime reports",
-                [
-                    { text: "Okay" }
-                ],
-                { cancelable: false }
-            );
-            return;
+    const getDynamicTimestamp = async () => {
+        // prevents local date changes to bypass post wait time
+        try {
+            const result = await axios.get('http://worldtimeapi.org/api/timezone/America/New_York')
+            const date = result.data.datetime
+            return date
+        } catch (err) {
+            console.log(err)
+            return null
         }
+    }
+    const dispatch = useDispatch()
 
+    const uploadCrime = async () => {
         if (validated && location) {
+            setIsUploading(true)
+            let date = await getDynamicTimestamp()
+
+            if (!date) {
+                setIsUploading(false)
+                Alert.alert(
+                    "Error posting report",
+                    "Please try again later",
+                    [
+                        { text: "Okay" }
+                    ],
+                    { cancelable: false }
+                );
+                return;
+            }
+            date = Date.parse(date)
+            const canPost = (date - Date.parse(lastReportedAt)) > 86400000
+
+            // check if it's been more than a day since last upload
+            if (!canPost) {
+                setIsUploading(false)
+                Alert.alert(
+                    "Error posting report",
+                    "Please wait 24 hours between posting crime reports",
+                    [
+                        { text: "Okay" }
+                    ],
+                    { cancelable: false }
+                );
+                return;
+            }
+
             setIsUploading(true)
             const report = {
                 description: descriptionText,
@@ -125,7 +154,7 @@ const AddCrimeScreen = ({ navigation, route }) => {
 
                 </TouchableOpacity>
             </View>
-            <SearchModal isAdding={true} lat={location && location.lat.toString()} lon={location && location.lng.toString()} locationChange={(newLocation, address) => {
+            <SearchModal city={location ? location.city : null} region={location ? location.region : null} isAdding={true} lat={location && location.lat.toString()} lon={location && location.lng.toString()} locationChange={(newLocation, address) => {
                 setChosenLocation(newLocation)
                 setChosenAddress(address.replace(', USA', '').replace(/\d{5}/, ''))
             }} setVisible={() => setModalVisible(false)} visible={modalVisible} />

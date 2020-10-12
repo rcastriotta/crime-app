@@ -1,5 +1,4 @@
 import React from 'react';
-import { View } from 'react-native';
 
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -7,8 +6,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import WelcomePage from '../screens/Auth/WelcomeScreen';
 import SignupScreen from '../screens/Auth/SignupScreen';
 import LoginScreen from '../screens/Auth/LoginScreen';
-
-import Colors from '../constants/Colors';
 
 const Stack = createStackNavigator();
 

@@ -18,7 +18,7 @@ const RatingModal = props => {
                             <View style={{ ...styles.ratingBar, backgroundColor: props.currentColors.main, width: `${props.percentage < 5 ? 6 : props.percentage}%` }} />
                         </View>
                     </View>
-                    <Text style={styles.description}>This rating represents a {props.radius} mi radius of your current location</Text>
+                    <Text style={styles.description}>This rating represents a <Text style={{ ...styles.description, color: Colors.accent }}>{props.radius} mi</Text> radius of your current location</Text>
                     <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => props.setVisible()}>
                         <Text style={styles.buttonText}>Okay!</Text>
                     </TouchableOpacity>

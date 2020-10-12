@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 
+// COMPONENTS
+import NoCrimesFound from './NoCrimesFound';
+
 // EXTERNAL
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from '../../../constants/Colors';
@@ -72,7 +75,7 @@ const ReportsData = props => {
                     ? crimeAmounts.map((typeData) => renderItem(typeData))
                     : location || props.isFetching ? <MaterialIndicator size={30} color={Colors.accent} style={{ marginTop: '25%' }} /> : <Text style={styles.noLocationText}>Couldn't get current location</Text>
                 }
-                {crimeAmounts && crimeAmounts.length === 0 ? <Text style={styles.noCrimeData}>No nearby crimes found!</Text> : null}
+                {crimeAmounts && crimeAmounts.length === 0 ? <NoCrimesFound /> : null}
 
             </View>
         </View>

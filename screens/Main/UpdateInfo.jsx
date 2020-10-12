@@ -176,7 +176,7 @@ const UpdateInfo = ({ navigation, route }) => {
                 </View>
                 <TouchableOpacity style={styles.button} onPress={submitButtonHandler}>
                     <View style={{ flex: 1 }} />
-                    <View style={{ width: '80%' }}>
+                    <View style={{ flexGrow: 1 }}>
                         <Text style={styles.buttonText}>{type === 'password' ? 'Change Password' : 'Update Email'}</Text>
                     </View>
                     <View style={{ flex: 1 }} >

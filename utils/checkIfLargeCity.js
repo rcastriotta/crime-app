@@ -18,7 +18,6 @@ export default checkIfLargeCity;
 
 // top 100 largest cities in US
 const largeCities = [
-    //{ city: 'Hubbardston', state: 'MA' },
     { city: 'New York', state: 'NY', popDensity: '301.5' },
     { city: 'Providence', state: 'RI', popDensity: 'Unknown' },
     { city: 'Los Angeles', state: 'CA', popDensity: ' 468.7' },

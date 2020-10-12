@@ -41,6 +41,11 @@ const locationRating = (crimes) => {
             continue;
         }
 
+        if (crime.type === 'Other') {
+            rating === rating - 2
+            continue;
+        }
+
         // all other crimes
         if (timeSinceReported <= 0.041666) {
             rating = rating - 15

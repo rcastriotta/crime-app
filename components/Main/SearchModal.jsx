@@ -8,6 +8,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 // COMPONENTS
 import Colors from '../../constants/Colors';
+import checkIfLargeCity from '../../utils/checkIfLargeCity';
 
 // REDUX
 import { useSelector } from 'react-redux';
@@ -15,15 +16,15 @@ import { useSelector } from 'react-redux';
 const SearchModal = props => {
     const [searchText, setSearchText] = useState('')
     const [results, setResults] = useState([])
-
+    let radius = checkIfLargeCity(props.city, props.region) * 1609
 
     useEffect(() => {
         (async () => {
             try {
                 let results;
                 if (props.isAdding) {
-                    const result1 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&language=pt_BR&location=${props.lat},${props.lon}&radius=1600&strictbounds&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
-                    const result2 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=establishment&language=pt_BR&location=${props.lat},${props.lon}&radius=1600&strictbounds&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
+                    const result1 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&language=pt_BR&location=${props.lat},${props.lon}&radius=${radius}&strictbounds&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
+                    const result2 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=establishment&language=pt_BR&location=${props.lat},${props.lon}&radius=${radius}&strictbounds&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
                     results = [...result1.data.predictions, ...result2.data.predictions]
                 } else {
                     const result1 = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&language=pt_BR&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
@@ -44,9 +45,8 @@ const SearchModal = props => {
     }, [searchText])
 
     const onLocationPress = async (address) => {
-
-        // we should first check if EAU is there
         const formattedAddress = address.replace(/ /g, '+')
+
         try {
             const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${formattedAddress}&key=AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88`)
             const latLngObj = response.data.results[0].geometry.location

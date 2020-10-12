@@ -6,7 +6,6 @@ import Colors from '../../constants/Colors';
 
 // COMPONENTS
 import Firebase from '../../api/firebase/config';
-import { convertSpeed } from 'geolib';
 
 const CrimeReport = props => {
     const [imageUrl, setImageUrl] = useState(null)
@@ -23,7 +22,7 @@ const CrimeReport = props => {
         if (props.authorName) {
             (async () => {
                 Firebase.storage().ref().child(`${props.authorId}/profilePicture/profile.jpg`).getDownloadURL().then(function (url) {
-                    if (componentIsMounted.current) {
+                    if (componentIsMounted.current || props.refreshed) {
                         setImageUrl(url)
                     }
                 }).catch(function (error) {
@@ -31,8 +30,7 @@ const CrimeReport = props => {
                 });
             })();
         }
-
-    }, [])
+    }, [props])
 
     return (
         <View style={{ ...styles.container, ...props.styles }}>
@@ -99,6 +97,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 10,
+        paddingRight: 10
 
     },
     addressText: {

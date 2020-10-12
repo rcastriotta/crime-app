@@ -8,18 +8,14 @@ import PasswordValidator from 'password-validator';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 
-var schema = new PasswordValidator();
-
-// Add properties to it
+const schema = new PasswordValidator();
 schema
     .is().min(8)                                    // Minimum length 8
     .is().max(100)                                  // Maximum length 100                                                                                    
     .has().not().spaces()                           // Should not have spaces
     .is().not().oneOf(['Passw0rd', 'Password123', 'Password', 'password']); // Blacklist these values
 
-// Validate against a password string
 
-// getting dimensions of screen
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 

@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
 // EXTERNAL
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIndicator } from 'react-native-indicators';
+import { SafeAreaView } from 'react-navigation';
 
 // COMPONENTS
 import Colors from '../../../constants/Colors';
@@ -13,7 +14,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const SearchBar = props => {
     return (
-        <SafeAreaView style={{ flex: 1, position: 'absolute' }}>
+        <SafeAreaView style={{ flex: 1, position: 'absolute' }} forceInset={{ top: 'always' }} >
             <TouchableOpacity
                 activeOpacity={1.0}
                 style={{ height: windowHeight < 700 ? windowHeight * .12 : windowHeight * .1, width: windowWidth }}

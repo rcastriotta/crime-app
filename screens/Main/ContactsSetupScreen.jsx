@@ -47,7 +47,7 @@ const ContactsSetupScreen = ({ navigation }) => {
         <SafeAreaView style={styles.screen}>
             <View style={styles.textContainer}>
                 <Text style={styles.header}>Add emergency contacts</Text>
-                <Text style={styles.paragraph}>If ever in danger, Crime App allows you to send out an SOS text message to all selected contacts at once.</Text>
+                <Text style={styles.paragraph}>If ever in danger, send out an SOS text message to all chosen emergency contacts at once</Text>
             </View>
 
             <View style={styles.iconContainer}>

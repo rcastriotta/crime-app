@@ -1,10 +1,10 @@
 {
     "expo": {
-        "name": "crime-app2",
-        "slug": "crime-app2",
+        "name": "SafeLoop",
+        "slug": "safeloop",
         "version": "1.0.0",
         "orientation": "portrait",
-        "icon": "./assets/appIcon.png",
+        "icon": "./assets/icon.png",
         "splash": {
             "image": "./assets/splash.png",
             "resizeMode": "contain",
@@ -25,8 +25,9 @@
             }
         },
         "ios": {
-            "supportsTablet": true,
-            "bundleIdentifier": "com.company",
+            "supportsTablet": false,
+            "bundleIdentifier": "com.360safeapp",
+            "buildNumber": "1.0.0",
             "config": {
                 "googleMapsApiKey": "AIzaSyCpFespimqgN7ACag02lSD1lCltQdbrq88",
                 "googleMobileAdsAppId": "ca-app-pub-1190322108532531~7339346116"

@@ -53,7 +53,10 @@ const SignupScreen = props => {
                     // we can popup an alert
                     setLoading(false)
                     err = err.toString()
-                    const errorMSG = `Please try again`
+                    let errorMSG;
+                    if (err.includes('The email address is already in use')) {
+                        errorMSG = 'Email already exists'
+                    }
                     Alert.alert(`Error Signing Up`,
                         `${errorMSG}`, [{ text: 'Okay' }])
                     console.log(err)

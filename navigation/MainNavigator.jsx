@@ -22,15 +22,11 @@ import ChooseTypeScreen from '../screens/Main/ChooseTypeScreen';
 import SettingsScreen from '../screens/Main/SettingsScreen';
 import MyReports from '../screens/Main/MyReports';
 import UpdateInfo from '../screens/Main/UpdateInfo';
-import NearbyReports from '../screens/Main/NearbyReportsScreen';
 import NearbyReportsScreen from '../screens/Main/NearbyReportsScreen';
 
 const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 
 const Settings = () => {
     return (
@@ -178,26 +174,13 @@ const MainNavigator = () => {
             mode="none"
             screenOptions={{ cardStyle: { backgroundColor: Colors.primary, flex: 1 } }}
             headerMode={'none'}
-            initialRouteName={useSelector(state => state.auth.firstSignIn) ? 'Setup' : 'Main'}>
+            initialRouteName={useSelector(state => state.auth.firstSignIn) ? 'Setup' : 'Main'}
+        >
             <Stack.Screen name="Home" component={HomeNavigator} options={{ animationEnabled: false }} />
             <Stack.Screen name="Setup" component={SetupNavigator} options={{ animationEnabled: false }} />
         </Stack.Navigator>
     )
 }
 
-const styles = StyleSheet.create({
-    tabLine: {
-        shadowColor: Colors.accent,
-        shadowOpacity: 0.47,
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 10,
-        top: -2,
-        width: 50,
-        height: 4,
-        backgroundColor: Colors.accent,
-        borderRadius: 10
-    }
-})
-export default MainNavigator;
 
-// {focused ? <View style={styles.tabLine}></View> : <View style={{ top: -2, width: 40, height: 4, borderRadius: 10 }}></View>}
+export default MainNavigator;

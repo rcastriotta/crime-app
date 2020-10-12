@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TouchableWithoutFeedback } from 'react-native';
 
 // COMPONENTS
 import Colors from '../../constants/Colors';
@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import { MaterialIndicator } from 'react-native-indicators';
 import * as ImageManipulator from "expo-image-manipulator";
+import { SafeAreaView } from 'react-navigation';
 
 // REDUX
 import { useSelector } from 'react-redux';
@@ -122,7 +123,7 @@ const SettingsModal = ({ navigation }) => {
 
 
     return (
-        <SafeAreaView style={styles.screen}>
+        <SafeAreaView style={styles.screen} forceInset={{ bottom: 'always' }}>
             <View style={styles.container}>
                 <TouchableOpacity activeOpacity={1.0} onPress={getImageHandler} style={styles.imageContainer}>
                     {imageUploading || profilePic === null
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
         fontFamily: 'TTN-Medium'
     },
     buttonsContainer: {
-        flex: 5,
+        flex: 10,
         width: '100%',
         paddingVertical: '10%',
         justifyContent: 'space-between'

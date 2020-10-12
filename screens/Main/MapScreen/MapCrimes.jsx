@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Button, Dimensions, Animated, } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 
 // EXTERNAL
 import Swiper from 'react-native-swiper';
-import Draggable from 'react-native-draggable';
 import { Ionicons } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 

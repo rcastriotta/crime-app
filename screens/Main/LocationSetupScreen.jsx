@@ -24,7 +24,7 @@ const LocationSetupScreen = ({ navigation }) => {
         <SafeAreaView style={styles.screen}>
             <View style={styles.textContainer}>
                 <Text style={styles.header}>Let's start with your location</Text>
-                <Text style={styles.paragraph}>Crime app uses your location to give your current location a safety rating, and to find crime near you.</Text>
+                <Text style={styles.paragraph}>See crime nearby and let others know your location if ever in danger</Text>
             </View>
 
             <View style={styles.iconContainer}>

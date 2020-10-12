@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, View, Text, Image, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, TextInput } from 'react-native';
 
-import Colors from '../../constants/Colors';
-
+// EXTERNAL
 import { Ionicons } from '@expo/vector-icons';
 
 // REDUX
@@ -12,6 +11,8 @@ import * as authActions from '../../store/actions/auth';
 
 // COMPONENTS
 import Contact from './Contact';
+import Colors from '../../constants/Colors';
+
 
 const SelectContacts = props => {
     const [currentData, setCurrentData] = useState(null)
@@ -68,7 +69,7 @@ const SelectContacts = props => {
                     <TextInput keyboardAppearance={'dark'} placeholder="Search" placeholderTextColor="gray" onChangeText={search} selectionColor="white" style={{ color: 'white', marginLeft: '5%', width: '100%' }} />
                 </View>
                 <View style={styles.flatlistContainer}>
-                    <FlatList style={{ width: '100%' }} data={currentData} renderItem={renderContacts} />
+                    <FlatList style={{ width: '100%' }} data={currentData} renderItem={renderContacts} contentContainerStyle={{ paddingBottom: 150 }} />
                 </View>
             </SafeAreaView>
         </Modal>

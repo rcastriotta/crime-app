@@ -31,6 +31,8 @@ export const signup = (email, password, name) => {
             .then(function(result) {
                 // update name 
                 name = name.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase() })
+                email = email.toLowerCase()
+
                 result.user.updateProfile({
                     displayName: name
                 }).catch((err) => {
@@ -42,7 +44,7 @@ export const signup = (email, password, name) => {
                 const user = {
                     userId,
                     name,
-                    email: email.toLowerCase(),
+                    email,
                 }
 
                 Firebase.firestore().collection('users').doc(userId).set(user)

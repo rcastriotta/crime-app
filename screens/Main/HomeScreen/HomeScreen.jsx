@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions, ScrollView } from 'react-native';
 
 // COMPONENTS
 import InDangerModal from './InDangerModal';
@@ -17,6 +17,8 @@ import * as SMS from 'expo-sms';
 import { LinearGradient } from 'expo-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIndicator } from 'react-native-indicators';
+import { SafeAreaView } from 'react-navigation';
+
 
 // REDUX
 import { useSelector, useDispatch } from 'react-redux';
@@ -58,7 +60,8 @@ const HomeScreen = ({ navigation }) => {
         return true;
     }
 
-    // once location data is recieved we grab nearby crime data
+
+    // once location data is recieved/changed we grab corresponding crime data
     useEffect(() => {
         if (location) {
             setIsFetching(true)
@@ -81,7 +84,7 @@ const HomeScreen = ({ navigation }) => {
     }, [location])
 
 
-    // on first load we grab location, we can also setup location listener here instead
+    // on first load we setup location listener
     useEffect(() => {
         (async () => {
             setIsFetching(true)
@@ -104,8 +107,11 @@ const HomeScreen = ({ navigation }) => {
 
         await SMS.sendSMSAsync(
             numbers,
-            `SAFETY ALERT: The person contacting you is in danger and/or needs your help.\n\nCURRENT LOCATION: ${currentCity}\n\n\nSent via Safety`,
-        ).catch((err) => console.log(err))
+            `SAFETY ALERT: The person contacting you is in danger and/or needs your help.\n\nCURRENT LOCATION: ${currentCity}\n\n\nSent via 360 Safe App`,
+        ).catch((err) => {
+            console.log(err)
+            return;
+        })
     }
 
     const mainModalPressHandler = type => {

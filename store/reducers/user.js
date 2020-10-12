@@ -7,7 +7,7 @@ const initialState = {
     email: null,
     profileImg: null,
     emergencyContacts: [],
-    lastReportedAt: null
+    lastReportedAt: 0
 }
 
 

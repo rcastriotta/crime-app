@@ -41,7 +41,7 @@ const WelcomeScreen = () => {
                 activeDotColor={Colors.accent}
             >
 
-                <ImageBackground source={require('../../assets/images/background1.jpg')} style={styles.imgBackground} imageStyle={{
+                <ImageBackground source={require('../../assets/images/background.jpg')} style={styles.imgBackground} imageStyle={{
                     width: windowWidth * 3,
                     height: '100%',
                     transform: [
@@ -60,7 +60,7 @@ const WelcomeScreen = () => {
 
 
 
-                <ImageBackground source={require('../../assets/images/background1.jpg')} style={styles.imgBackground} imageStyle={{
+                <ImageBackground source={require('../../assets/images/background.jpg')} style={styles.imgBackground} imageStyle={{
                     width: windowWidth * 3,
                     height: '100%',
                     transform: [
@@ -76,7 +76,7 @@ const WelcomeScreen = () => {
                     </View>
                 </ImageBackground>
 
-                <ImageBackground source={require('../../assets/images/background1.jpg')} style={styles.imgBackground} imageStyle={{
+                <ImageBackground source={require('../../assets/images/background.jpg')} style={styles.imgBackground} imageStyle={{
                     width: '300%',
                     height: '100%',
                     transform: [
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 100,
         height: 100,
-        bottom: hp('70%')
+        bottom: hp('65%')
     }
 
 
